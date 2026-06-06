@@ -36,35 +36,39 @@ function GamesPage() {
   return (
     <SiteLayout>
       <section className="mx-auto max-w-7xl px-4 pt-14 sm:px-6 lg:px-8">
-        <h1 className="text-5xl font-black tracking-tight sm:text-6xl">
-          The <span className="text-gradient-brand">portfolio</span>
-        </h1>
-        <p className="mt-3 max-w-2xl text-muted-foreground">
-          Every title is certified, mobile-first, and ready to drop into your lobby.
-        </p>
+        <ScrollReveal animation="fade-up">
+          <h1 className="text-5xl font-black tracking-tight sm:text-6xl">
+            The <span className="text-gradient-brand">portfolio</span>
+          </h1>
+          <p className="mt-3 max-w-2xl text-muted-foreground">
+            Every title is certified, mobile-first, and ready to drop into your lobby.
+          </p>
+        </ScrollReveal>
 
-        <div className="mt-8 flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 min-w-[220px] max-w-md">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search games…" className="pl-9 h-11" />
+        <ScrollReveal animation="fade-up" delay={150}>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <div className="relative flex-1 min-w-[220px] max-w-md">
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search games…" className="pl-9 h-11" />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {["All", ...categories].map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setCat(c)}
+                  className={cn(
+                    "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-smooth",
+                    cat === c
+                      ? "border-transparent bg-gradient-brand text-white shadow-glow"
+                      : "border-border bg-card text-foreground/70 hover:text-foreground",
+                  )}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {["All", ...categories].map((c) => (
-              <button
-                key={c}
-                onClick={() => setCat(c)}
-                className={cn(
-                  "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-smooth",
-                  cat === c
-                    ? "border-transparent bg-gradient-brand text-white shadow-glow"
-                    : "border-border bg-card text-foreground/70 hover:text-foreground",
-                )}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </div>
+        </ScrollReveal>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
