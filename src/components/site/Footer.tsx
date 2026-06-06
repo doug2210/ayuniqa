@@ -34,7 +34,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-border py-5 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} ReelForge Studios. All rights reserved.
+        © {new Date().getFullYear()} Ayuniqa Studios. All rights reserved.
       </div>
     </footer>
   );
