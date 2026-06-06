@@ -76,31 +76,32 @@ function GamesPage() {
           <p className="py-20 text-center text-muted-foreground">No games match your search.</p>
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filtered.map((g) => (
-              <Link
-                key={g.slug}
-                to="/games/$slug"
-                params={{ slug: g.slug }}
-                className="group overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-smooth hover:-translate-y-1 hover:shadow-glow"
-              >
-                <div className="relative aspect-square overflow-hidden bg-gradient-warm">
-                  <img src={g.cover} alt={g.title} loading="lazy" width={1024} height={1024} className="h-full w-full object-cover transition-smooth group-hover:scale-105" />
-                  <span className="absolute right-3 top-3 rounded-full bg-[color:var(--brand-yellow)] px-2 py-0.5 text-[10px] font-bold text-[color:var(--brand-grey)]">
-                    {g.category}
-                  </span>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-bold">{g.title}</h3>
-                  <p className="mt-1 text-xs text-muted-foreground">{g.tagline}</p>
-                  <div className="mt-3 flex items-center gap-3 text-[11px] uppercase tracking-wide text-muted-foreground">
-                    <span>RTP {g.rtp}%</span>
-                    <span>·</span>
-                    <span>{g.volatility} vol</span>
-                    <span>·</span>
-                    <span>{g.reels}</span>
+            {filtered.map((g, i) => (
+              <ScrollReveal key={g.slug} animation="fade-up" delay={(i % 4) * 100}>
+                <Link
+                  to="/games/$slug"
+                  params={{ slug: g.slug }}
+                  className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-smooth hover:-translate-y-1 hover:shadow-glow"
+                >
+                  <div className="relative aspect-square overflow-hidden bg-gradient-warm">
+                    <img src={g.cover} alt={g.title} loading="lazy" width={1024} height={1024} className="h-full w-full object-cover transition-smooth group-hover:scale-105" />
+                    <span className="absolute right-3 top-3 rounded-full bg-[color:var(--brand-yellow)] px-2 py-0.5 text-[10px] font-bold text-[color:var(--brand-grey)]">
+                      {g.category}
+                    </span>
                   </div>
-                </div>
-              </Link>
+                  <div className="p-4">
+                    <h3 className="font-bold">{g.title}</h3>
+                    <p className="mt-1 text-xs text-muted-foreground">{g.tagline}</p>
+                    <div className="mt-3 flex items-center gap-3 text-[11px] uppercase tracking-wide text-muted-foreground">
+                      <span>RTP {g.rtp}%</span>
+                      <span>·</span>
+                      <span>{g.volatility} vol</span>
+                      <span>·</span>
+                      <span>{g.reels}</span>
+                    </div>
+                  </div>
+                </Link>
+              </ScrollReveal>
             ))}
           </div>
         )}
