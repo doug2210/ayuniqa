@@ -3,7 +3,7 @@ import { ArrowRight, Sparkles, Gamepad2, Globe, ShieldCheck, Zap, Trophy } from 
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { games } from "@/lib/games-data";
-import hero from "@/assets/hero-slot.jpg";
+import { HeroStage } from "@/components/site/HeroStage";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -59,15 +59,8 @@ function Hero() {
           </div>
         </div>
         <div className="relative">
-          <div className="absolute inset-0 -z-10 rounded-[3rem] bg-gradient-warm opacity-30 blur-3xl" />
-          <img
-            src={hero}
-            alt="Premium slot reels spinning"
-            width={1536}
-            height={1152}
-            className="animate-float w-full select-none drop-shadow-2xl"
-          />
-          <span className="absolute -bottom-4 left-6 inline-flex items-center gap-2 rounded-full bg-[color:var(--brand-yellow)] px-3 py-1.5 text-xs font-bold text-[color:var(--brand-grey)] shadow-card">
+          <HeroStage />
+          <span className="absolute -bottom-2 left-1/2 z-30 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-[color:var(--brand-yellow)] px-3 py-1.5 text-xs font-bold text-[color:var(--brand-grey)] shadow-card">
             <Trophy className="!size-3.5" /> Studio of the year nominee
           </span>
         </div>
