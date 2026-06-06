@@ -118,37 +118,40 @@ function FeaturedGames() {
   return (
     <section className="bg-secondary/40 py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h2 className="text-4xl font-black tracking-tight sm:text-5xl">Featured games</h2>
-            <p className="mt-2 text-muted-foreground">A taste of the Ayuniqa portfolio.</p>
+        <ScrollReveal animation="fade-up">
+          <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 className="text-4xl font-black tracking-tight sm:text-5xl">Featured games</h2>
+              <p className="mt-2 text-muted-foreground">A taste of the Ayuniqa portfolio.</p>
+            </div>
+            <Button asChild variant="outline">
+              <Link to="/games">View all <ArrowRight /></Link>
+            </Button>
           </div>
-          <Button asChild variant="outline">
-            <Link to="/games">View all <ArrowRight /></Link>
-          </Button>
-        </div>
+        </ScrollReveal>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {games.map((g) => (
-            <Link
-              key={g.slug}
-              to="/games/$slug"
-              params={{ slug: g.slug }}
-              className="group overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-smooth hover:-translate-y-1 hover:shadow-glow"
-            >
-              <div className="relative aspect-square overflow-hidden bg-gradient-warm">
-                <img src={g.cover} alt={g.title} loading="lazy" width={1024} height={1024} className="h-full w-full object-cover transition-smooth group-hover:scale-105" />
-                <span className="absolute right-3 top-3 rounded-full bg-[color:var(--brand-yellow)] px-2 py-0.5 text-[10px] font-bold text-[color:var(--brand-grey)]">
-                  {g.volatility}
-                </span>
-              </div>
-              <div className="p-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold">{g.title}</h3>
-                  <span className="text-xs text-muted-foreground">RTP {g.rtp}%</span>
+          {games.map((g, i) => (
+            <ScrollReveal key={g.slug} animation="fade-up" delay={i * 100}>
+              <Link
+                to="/games/$slug"
+                params={{ slug: g.slug }}
+                className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-smooth hover:-translate-y-1 hover:shadow-glow"
+              >
+                <div className="relative aspect-square overflow-hidden bg-gradient-warm">
+                  <img src={g.cover} alt={g.title} loading="lazy" width={1024} height={1024} className="h-full w-full object-cover transition-smooth group-hover:scale-105" />
+                  <span className="absolute right-3 top-3 rounded-full bg-[color:var(--brand-yellow)] px-2 py-0.5 text-[10px] font-bold text-[color:var(--brand-grey)]">
+                    {g.volatility}
+                  </span>
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">{g.tagline}</p>
-              </div>
-            </Link>
+                <div className="p-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-bold">{g.title}</h3>
+                    <span className="text-xs text-muted-foreground">RTP {g.rtp}%</span>
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">{g.tagline}</p>
+                </div>
+              </Link>
+            </ScrollReveal>
           ))}
         </div>
       </div>
