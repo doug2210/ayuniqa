@@ -5,6 +5,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { Input } from "@/components/ui/input";
 import { games, categories } from "@/lib/games-data";
 import { cn } from "@/lib/utils";
+import { ScrollReveal } from "@/components/site/ScrollReveal";
 
 export const Route = createFileRoute("/games")({
   head: () => ({

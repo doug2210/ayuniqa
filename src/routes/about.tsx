@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import { ScrollReveal } from "@/components/site/ScrollReveal";
 
 export const Route = createFileRoute("/about")({
   head: () => ({

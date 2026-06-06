@@ -4,6 +4,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { games } from "@/lib/games-data";
 import { HeroStage } from "@/components/site/HeroStage";
+import { ScrollReveal } from "@/components/site/ScrollReveal";
 
 export const Route = createFileRoute("/")({
   head: () => ({

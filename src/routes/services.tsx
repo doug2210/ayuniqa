@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Palette, Cpu, ShieldCheck, Plug, BarChart3, Headphones } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import { ScrollReveal } from "@/components/site/ScrollReveal";
 
 export const Route = createFileRoute("/services")({
   head: () => ({
