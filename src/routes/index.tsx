@@ -169,24 +169,28 @@ function Services() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
       <div className="grid gap-10 lg:grid-cols-2">
-        <div>
-          <h2 className="text-4xl font-black tracking-tight sm:text-5xl">
-            End-to-end <span className="text-gradient-brand">slot delivery</span>.
-          </h2>
-          <p className="mt-3 max-w-md text-muted-foreground">
-            From the first sketch to certified release — one studio, one accountable team.
-          </p>
-          <Button asChild className="mt-6 bg-gradient-brand text-white">
-            <Link to="/services">All services <ArrowRight /></Link>
-          </Button>
-        </div>
+        <ScrollReveal animation="fade-right">
+          <div>
+            <h2 className="text-4xl font-black tracking-tight sm:text-5xl">
+              End-to-end <span className="text-gradient-brand">slot delivery</span>.
+            </h2>
+            <p className="mt-3 max-w-md text-muted-foreground">
+              From the first sketch to certified release — one studio, one accountable team.
+            </p>
+            <Button asChild className="mt-6 bg-gradient-brand text-white">
+              <Link to="/services">All services <ArrowRight /></Link>
+            </Button>
+          </div>
+        </ScrollReveal>
         <div className="grid gap-4 sm:grid-cols-2">
           {items.map((i, idx) => (
-            <div key={i.title} className="rounded-2xl border border-border bg-card p-5 shadow-card">
-              <div className="text-xs font-bold text-[color:var(--brand-orange)]">0{idx + 1}</div>
-              <h3 className="mt-1 font-bold">{i.title}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{i.body}</p>
-            </div>
+            <ScrollReveal key={i.title} animation="fade-up" delay={idx * 100}>
+              <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
+                <div className="text-xs font-bold text-[color:var(--brand-orange)]">0{idx + 1}</div>
+                <h3 className="mt-1 font-bold">{i.title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{i.body}</p>
+              </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>
