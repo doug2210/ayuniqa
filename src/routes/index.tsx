@@ -201,19 +201,21 @@ function Services() {
 function CTA() {
   return (
     <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 lg:px-8">
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-brand p-10 text-white shadow-glow sm:p-14">
-        <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[color:var(--brand-yellow)]/30 blur-3xl" />
-        <h2 className="max-w-2xl text-3xl font-black sm:text-5xl">Ready to add Ayuniqa titles to your lobby?</h2>
-        <p className="mt-3 max-w-xl text-white/90">Tell us about your platform — we'll get you live with a sample title in 14 days.</p>
-        <div className="mt-7 flex flex-wrap gap-3">
-          <Button asChild size="lg" variant="secondary">
-            <Link to="/contact">Get in touch</Link>
-          </Button>
-          <Button asChild size="lg" variant="outline" className="border-white/40 bg-white/0 text-white hover:bg-white/10 hover:text-white">
-            <Link to="/client-zone">Client Zone</Link>
-          </Button>
+      <ScrollReveal animation="zoom-in">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-brand p-10 text-white shadow-glow sm:p-14">
+          <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[color:var(--brand-yellow)]/30 blur-3xl" />
+          <h2 className="max-w-2xl text-3xl font-black sm:text-5xl">Ready to add Ayuniqa titles to your lobby?</h2>
+          <p className="mt-3 max-w-xl text-white/90">Tell us about your platform — we'll get you live with a sample title in 14 days.</p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Button asChild size="lg" variant="secondary">
+              <Link to="/contact">Get in touch</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="border-white/40 bg-white/0 text-white hover:bg-white/10 hover:text-white">
+              <Link to="/client-zone">Client Zone</Link>
+            </Button>
+          </div>
         </div>
-      </div>
+      </ScrollReveal>
     </section>
   );
 }
