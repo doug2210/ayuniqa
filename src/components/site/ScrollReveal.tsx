@@ -36,7 +36,7 @@ export function ScrollReveal({
   children,
   animation = "fade-up",
   delay = 0,
-  duration = 700,
+  duration = 1000,
   className,
   threshold,
 }: ScrollRevealProps) {
@@ -46,7 +46,8 @@ export function ScrollReveal({
     <div
       ref={ref}
       className={cn(
-        "transition-[opacity,transform] ease-out will-change-transform",
+        "transition-[opacity,transform] will-change-transform",
+        "ease-[cubic-bezier(0.34,1.56,0.64,1)]",
         isVisible ? "opacity-100 translate-x-0 translate-y-0 scale-100" : hiddenState[animation],
         className
       )}
