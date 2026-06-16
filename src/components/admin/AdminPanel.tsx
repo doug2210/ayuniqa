@@ -30,7 +30,7 @@ import {
   type GameOverride,
   type SiteConfig,
 } from "@/lib/site-config";
-import { DEFAULT_FLOATING_ITEMS, type FloatingItem } from "@/components/site/FloatingSlotItems";
+import { DEFAULT_FLOATING_ITEMS, type FloatingItem } from "@/lib/site-config";
 import { ImageField } from "./ImageField";
 import { adminSignOut } from "./AdminGate";
 

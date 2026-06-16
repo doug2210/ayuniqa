@@ -1,5 +1,18 @@
-import { DEFAULT_FLOATING_ITEMS, type FloatingItem } from "@/components/site/FloatingSlotItems";
 import { games as defaultGames, type Game } from "@/lib/games-data";
+
+export type FloatingItem = {
+  symbol: string;
+  size?: number;
+  speed?: number;
+  opacity?: number;
+  hue?: number;
+};
+
+export const DEFAULT_FLOATING_ITEMS: FloatingItem[] = [
+  { symbol: "💎", size: 110, speed: 0.7, opacity: 1.0, hue: 190 },
+  { symbol: "7️⃣", size: 130, speed: 0.5, opacity: 1.0, hue: 0 },
+  { symbol: "🎰", size: 140, speed: 0.45, opacity: 1.0, hue: 280 },
+];
 
 export type HeroCTA = { label: string; href: string };
 

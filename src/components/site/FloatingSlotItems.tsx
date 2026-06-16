@@ -1,22 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSiteConfig } from "@/components/site-config/SiteConfigProvider";
-
-// Default slot-themed symbols. Later, the admin panel can override
-// this list (and per-symbol speed/size/opacity) via a backend config.
-// Until then, the source of truth lives here so anyone can tweak it.
-export type FloatingItem = {
-  symbol: string; // emoji or short text
-  size?: number; // px
-  speed?: number; // multiplier, 1 = matches scroll
-  opacity?: number;
-  hue?: number; // optional drop-shadow color hue
-};
-
-export const DEFAULT_FLOATING_ITEMS: FloatingItem[] = [
-  { symbol: "💎", size: 110, speed: 0.7, opacity: 1.0, hue: 190 },
-  { symbol: "7️⃣", size: 130, speed: 0.5, opacity: 1.0, hue: 0 },
-  { symbol: "🎰", size: 140, speed: 0.45, opacity: 1.0, hue: 280 },
-];
+import { DEFAULT_FLOATING_ITEMS, type FloatingItem } from "@/lib/site-config";
+export { DEFAULT_FLOATING_ITEMS, type FloatingItem };
 
 type Placed = FloatingItem & {
   id: number;
