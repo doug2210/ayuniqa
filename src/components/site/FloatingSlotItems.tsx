@@ -42,39 +42,47 @@ export function FloatingSlotItems({
   const stage = vh + 240;
 
   // Build a stable layout of placed items (deterministic per render).
+  // Split evenly between left and right sides.
   const placed = useMemo<Placed[]>(() => {
-    const rand = seededRandom(1337);
-    const count = Math.max(0, Math.round(effectiveItems.length * effectiveDensity));
+    const leftRand = seededRandom(1337);
+    const rightRand = seededRandom(7331);
+    let count = Math.max(0, Math.round(effectiveItems.length * effectiveDensity));
+    // Force an even count so both sides are perfectly balanced.
+    if (count % 2 !== 0) count -= 1;
+    const perSide = Math.max(0, count / 2);
     const out: Placed[] = [];
-    for (let i = 0; i < count; i++) {
-      const base = effectiveItems[i % effectiveItems.length];
-      // Place symbols on the left or right edge only so they never overlap content.
-      const side = i % 2 === 0 ? "left" : "right";
+    let id = 0;
+
+    const place = (rand: () => number, side: "left" | "right") => {
+      const base = effectiveItems[id % effectiveItems.length];
       let leftVw: number;
       if (isMobile) {
-        // On mobile, push them mostly off-screen so they never cover text.
         if (side === "left") {
-          leftVw = -8 + rand() * 6; // -8 to -2vw (partially off-screen left)
+          leftVw = -8 + rand() * 6; // -8 to -2vw
         } else {
-          leftVw = 96 + rand() * 6; // 96 to 102vw (partially off-screen right)
+          leftVw = 96 + rand() * 6; // 96 to 102vw
         }
       } else {
         if (side === "left") {
-          leftVw = -6 + rand() * 8; // -6 to 2vw (edge / slightly off-screen)
+          leftVw = -6 + rand() * 8; // -6 to 2vw
         } else {
-          leftVw = 98 + rand() * 8; // 98 to 106vw (edge / slightly off-screen)
+          leftVw = 98 + rand() * 8; // 98 to 106vw
         }
       }
       out.push({
         ...base,
-        id: i,
+        id,
         left: leftVw,
         offset: rand() * stage,
         drift: isMobile ? 6 + rand() * 14 : 20 + rand() * 60,
         driftSpeed: 0.0008 + rand() * 0.0014,
         rotate: (rand() - 0.5) * 0.4,
       });
-    }
+      id += 1;
+    };
+
+    for (let i = 0; i < perSide; i++) place(leftRand, "left");
+    for (let i = 0; i < perSide; i++) place(rightRand, "right");
     return out;
   }, [effectiveItems, effectiveDensity, stage, isMobile]);
 
