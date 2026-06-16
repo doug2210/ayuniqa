@@ -307,6 +307,46 @@ function HeroEditor({
   value: typeof DEFAULT_HERO;
   onChange: (next: typeof DEFAULT_HERO) => void;
 }) {
+  return (
+    <Tabs defaultValue="text">
+      <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+        <TabsTrigger value="text">Textos</TabsTrigger>
+        <TabsTrigger value="stats">Stats</TabsTrigger>
+        <TabsTrigger value="award">Badge</TabsTrigger>
+        <TabsTrigger value="stage">Palco</TabsTrigger>
+      </TabsList>
+      <TabsContent value="text" className="mt-4">
+        <HeroTextEditor value={value} onChange={onChange} />
+      </TabsContent>
+      <TabsContent value="stats" className="mt-4">
+        <HeroStatsEditor
+          value={value.stats}
+          onChange={(stats) => onChange({ ...value, stats })}
+        />
+      </TabsContent>
+      <TabsContent value="award" className="mt-4">
+        <HeroAwardEditor
+          value={value.award}
+          onChange={(award) => onChange({ ...value, award })}
+        />
+      </TabsContent>
+      <TabsContent value="stage" className="mt-4">
+        <HeroStageEditor
+          value={value.stage}
+          onChange={(stage) => onChange({ ...value, stage })}
+        />
+      </TabsContent>
+    </Tabs>
+  );
+}
+
+function HeroTextEditor({
+  value,
+  onChange,
+}: {
+  value: typeof DEFAULT_HERO;
+  onChange: (next: typeof DEFAULT_HERO) => void;
+}) {
   const set = <K extends keyof typeof DEFAULT_HERO>(k: K, v: (typeof DEFAULT_HERO)[K]) =>
     onChange({ ...value, [k]: v });
   return (
@@ -365,17 +405,347 @@ function HeroEditor({
           </div>
         </fieldset>
       </div>
-      <ImageField
-        label="Hero image (optional — replaces the animated reel stage)"
-        value={value.heroImageUrl}
-        onChange={(v) => set("heroImageUrl", v)}
-      />
       <div className="pt-2">
-        <Button variant="ghost" size="sm" onClick={() => onChange(DEFAULT_HERO)}>
-          <RotateCcw className="!size-3.5" /> Reset hero
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() =>
+            onChange({
+              ...value,
+              badge: DEFAULT_HERO.badge,
+              titlePrefix: DEFAULT_HERO.titlePrefix,
+              titleAccent: DEFAULT_HERO.titleAccent,
+              titleSuffix: DEFAULT_HERO.titleSuffix,
+              subtitle: DEFAULT_HERO.subtitle,
+              primaryCta: DEFAULT_HERO.primaryCta,
+              secondaryCta: DEFAULT_HERO.secondaryCta,
+            })
+          }
+        >
+          <RotateCcw className="!size-3.5" /> Reset textos
         </Button>
       </div>
     </Card>
+  );
+}
+
+/* ---------- Hero stats / award / stage ---------- */
+
+function HeroStatsEditor({
+  value,
+  onChange,
+}: {
+  value: StatItem[];
+  onChange: (next: StatItem[]) => void;
+}) {
+  const update = (i: number, patch: Partial<StatItem>) =>
+    onChange(value.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
+  return (
+    <div className="space-y-3">
+      {value.map((s, i) => (
+        <Card key={i} className="p-4">
+          <div className="grid gap-3 sm:grid-cols-[auto,1fr,1fr,1fr,1fr] sm:items-end">
+            <div className="flex items-center gap-2">
+              <Switch checked={s.enabled} onCheckedChange={(v) => update(i, { enabled: v })} />
+              <Label className="text-xs">On</Label>
+            </div>
+            <NumberField label="Value" value={s.value} min={0} max={999999} step={0.1} onChange={(v) => update(i, { value: v })} />
+            <div>
+              <Label className="text-xs">Suffix</Label>
+              <Input value={s.suffix} onChange={(e) => update(i, { suffix: e.target.value })} />
+            </div>
+            <NumberField label="Decimals" value={s.decimals} min={0} max={3} step={1} onChange={(v) => update(i, { decimals: v })} />
+            <div>
+              <Label className="text-xs">Label</Label>
+              <Input value={s.label} onChange={(e) => update(i, { label: e.target.value })} />
+            </div>
+          </div>
+        </Card>
+      ))}
+      <Button variant="ghost" size="sm" onClick={() => onChange(DEFAULT_STATS)}>
+        <RotateCcw className="!size-3.5" /> Reset stats
+      </Button>
+    </div>
+  );
+}
+
+function HeroAwardEditor({
+  value,
+  onChange,
+}: {
+  value: AwardBadge;
+  onChange: (next: AwardBadge) => void;
+}) {
+  return (
+    <Card className="space-y-4 p-5">
+      <div className="flex items-center gap-3">
+        <Switch checked={value.enabled} onCheckedChange={(v) => onChange({ ...value, enabled: v })} />
+        <Label>Mostrar badge</Label>
+      </div>
+      <div>
+        <Label>Texto</Label>
+        <Input value={value.label} onChange={(e) => onChange({ ...value, label: e.target.value })} />
+      </div>
+      <Button variant="ghost" size="sm" onClick={() => onChange(DEFAULT_AWARD)}>
+        <RotateCcw className="!size-3.5" /> Reset
+      </Button>
+    </Card>
+  );
+}
+
+function HeroStageEditor({
+  value,
+  onChange,
+}: {
+  value: HeroStageConfig;
+  onChange: (next: HeroStageConfig) => void;
+}) {
+  return (
+    <div className="space-y-6">
+      <Card className="space-y-4 p-5">
+        <div>
+          <h3 className="font-bold">Miolo central</h3>
+          <p className="text-xs text-muted-foreground">Escolha o que aparece no centro do palco.</p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-[200px,1fr] sm:items-center">
+          <Label>Modo</Label>
+          <Select value={value.mode} onValueChange={(v) => onChange({ ...value, mode: v as HeroStageConfig["mode"] })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="character">Imagem custom (personagem)</SelectItem>
+              <SelectItem value="reels">Reels animados</SelectItem>
+              <SelectItem value="none">Nenhum</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        {value.mode === "character" && (
+          <div className="space-y-4 rounded-lg border border-border p-4">
+            <ImageField
+              label="Imagem do personagem (PNG / SVG / JPG)"
+              value={value.character.imageUrl}
+              onChange={(v) => onChange({ ...value, character: { ...value.character, imageUrl: v } })}
+              accept="image/png,image/svg+xml,image/jpeg,image/webp"
+              uploadLabel="Upload personagem"
+            />
+            <div className="grid gap-3 sm:grid-cols-3">
+              <SliderField label="Escala (%)" value={value.character.scale} min={50} max={120} step={1}
+                onChange={(v) => onChange({ ...value, character: { ...value.character, scale: v } })} />
+              <SliderField label="Offset Y (%)" value={value.character.offsetY} min={-20} max={20} step={1}
+                onChange={(v) => onChange({ ...value, character: { ...value.character, offsetY: v } })} />
+              <SliderField label="Parallax" value={value.character.parallax} min={0} max={1} step={0.05}
+                onChange={(v) => onChange({ ...value, character: { ...value.character, parallax: v } })} />
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch checked={value.character.shadow}
+                onCheckedChange={(v) => onChange({ ...value, character: { ...value.character, shadow: v } })} />
+              <Label>Glow atrás do personagem</Label>
+            </div>
+          </div>
+        )}
+      </Card>
+
+      <Card className="space-y-4 p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-bold">Ícones flutuantes ({value.symbols.length})</h3>
+            <p className="text-xs text-muted-foreground">Aparecem ao redor do miolo central.</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm"
+              onClick={() => onChange({ ...value, symbols: DEFAULT_HERO_STAGE.symbols })}>
+              <RotateCcw className="!size-3.5" /> Reset
+            </Button>
+            <Button size="sm"
+              onClick={() => onChange({
+                ...value,
+                symbols: [...value.symbols, {
+                  kind: "lucide", icon: "Star", x: 50, y: 50, size: 40,
+                  tint: "orange", depth: 0.6, delay: 0, duration: 6,
+                }],
+              })}>
+              <Plus className="!size-3.5" /> Adicionar
+            </Button>
+          </div>
+        </div>
+        <div className="space-y-3">
+          {value.symbols.map((sym, i) => (
+            <StageSymbolRow
+              key={i}
+              value={sym}
+              onChange={(patch) =>
+                onChange({
+                  ...value,
+                  symbols: value.symbols.map((s, idx) => (idx === i ? { ...s, ...patch } : s)),
+                })
+              }
+              onRemove={() =>
+                onChange({ ...value, symbols: value.symbols.filter((_, idx) => idx !== i) })
+              }
+            />
+          ))}
+        </div>
+      </Card>
+
+      <Card className="space-y-4 p-5">
+        <h3 className="font-bold">Badges decorativos</h3>
+        <StageBadgeRow label="Mega Win" value={value.badges.megaWin}
+          onChange={(b) => onChange({ ...value, badges: { ...value.badges, megaWin: b } })} />
+        <StageBadgeRow label="HTML5" value={value.badges.html5}
+          onChange={(b) => onChange({ ...value, badges: { ...value.badges, html5: b } })} />
+      </Card>
+
+      <div>
+        <Button variant="ghost" size="sm" onClick={() => onChange(DEFAULT_HERO_STAGE)}>
+          <RotateCcw className="!size-3.5" /> Reset palco
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function StageSymbolRow({
+  value,
+  onChange,
+  onRemove,
+}: {
+  value: HeroStageSymbol;
+  onChange: (patch: Partial<HeroStageSymbol>) => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="space-y-3 rounded-lg border border-border p-3">
+      <div className="grid gap-3 sm:grid-cols-[1fr,1fr,1fr,auto] sm:items-end">
+        <div>
+          <Label className="text-xs">Tipo</Label>
+          <Select value={value.kind} onValueChange={(v) => onChange({ kind: v as HeroStageSymbol["kind"] })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="lucide">Ícone (Lucide)</SelectItem>
+              <SelectItem value="emoji">Emoji / texto</SelectItem>
+              <SelectItem value="image">Imagem</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        {value.kind === "lucide" && (
+          <div>
+            <Label className="text-xs">Ícone</Label>
+            <Select value={value.icon ?? "Star"} onValueChange={(v) => onChange({ icon: v as HeroStageSymbol["icon"] })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {STAGE_ICON_NAMES.map((n) => (
+                  <SelectItem key={n} value={n}>{n}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+        {value.kind === "emoji" && (
+          <div>
+            <Label className="text-xs">Emoji / texto</Label>
+            <Input value={value.emoji ?? ""} onChange={(e) => onChange({ emoji: e.target.value })} />
+          </div>
+        )}
+        {value.kind === "image" && <div />}
+        <div>
+          <Label className="text-xs">Tint</Label>
+          <Select value={value.tint} onValueChange={(v) => onChange({ tint: v as StageTint })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="orange">Orange</SelectItem>
+              <SelectItem value="yellow">Yellow</SelectItem>
+              <SelectItem value="light">Light orange</SelectItem>
+              <SelectItem value="grey">Grey</SelectItem>
+              <SelectItem value="custom">Custom</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Button variant="ghost" size="icon" onClick={onRemove} aria-label="Remover">
+          <Trash2 className="!size-4 text-destructive" />
+        </Button>
+      </div>
+      {value.tint === "custom" && (
+        <div>
+          <Label className="text-xs">Cor (hex)</Label>
+          <Input value={value.color ?? "#ff7a00"} onChange={(e) => onChange({ color: e.target.value })} />
+        </div>
+      )}
+      {value.kind === "image" && (
+        <ImageField
+          label="Imagem"
+          value={value.imageUrl ?? null}
+          onChange={(v) => onChange({ imageUrl: v })}
+          accept="image/png,image/svg+xml,image/webp,image/jpeg"
+          uploadLabel="Upload"
+        />
+      )}
+      <div className="grid gap-3 sm:grid-cols-6">
+        <SliderField label="X %" value={value.x} min={0} max={100} step={1} onChange={(v) => onChange({ x: v })} />
+        <SliderField label="Y %" value={value.y} min={0} max={100} step={1} onChange={(v) => onChange({ y: v })} />
+        <NumberField label="Size" value={value.size} min={16} max={140} step={2} onChange={(v) => onChange({ size: v })} />
+        <SliderField label="Depth" value={value.depth} min={0} max={1} step={0.05} onChange={(v) => onChange({ depth: v })} />
+        <NumberField label="Delay" value={value.delay} min={0} max={10} step={0.1} onChange={(v) => onChange({ delay: v })} />
+        <NumberField label="Duration" value={value.duration} min={1} max={15} step={0.2} onChange={(v) => onChange({ duration: v })} />
+      </div>
+    </div>
+  );
+}
+
+function StageBadgeRow({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: HeroStageBadge;
+  onChange: (next: HeroStageBadge) => void;
+}) {
+  return (
+    <div className="grid gap-3 rounded-lg border border-border p-3 sm:grid-cols-[auto,1fr,180px] sm:items-end">
+      <div className="flex items-center gap-2">
+        <Switch checked={value.enabled} onCheckedChange={(v) => onChange({ ...value, enabled: v })} />
+        <Label className="text-xs">{label}</Label>
+      </div>
+      <div>
+        <Label className="text-xs">Texto</Label>
+        <Input value={value.label} onChange={(e) => onChange({ ...value, label: e.target.value })} />
+      </div>
+      <div>
+        <Label className="text-xs">Lado</Label>
+        <Select value={value.side} onValueChange={(v) => onChange({ ...value, side: v as "left" | "right" })}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="left">Esquerda</SelectItem>
+            <SelectItem value="right">Direita</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}
+
+function SliderField({
+  label,
+  value,
+  min,
+  max,
+  step,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between">
+        <Label className="text-xs">{label}</Label>
+        <span className="text-xs font-mono text-muted-foreground">{typeof value === "number" ? value.toFixed(step < 1 ? 2 : 0) : value}</span>
+      </div>
+      <Slider value={[value]} min={min} max={max} step={step} onValueChange={([v]) => onChange(v)} />
+    </div>
   );
 }
 
