@@ -23,8 +23,13 @@ export function ImageField({
   const [busy, setBusy] = useState(false);
 
   const handleFile = async (file: File) => {
-    if (file.size > 1_500_000) {
-      alert("Image is larger than ~1.5MB. localStorage may fail. Prefer a URL.");
+    const isGif = file.type === "image/gif";
+    const limit = isGif ? 4_000_000 : 1_500_000;
+    if (file.size > limit) {
+      alert(
+        `Arquivo maior que ${Math.round(limit / 1_000_000)}MB. ` +
+          "O armazenamento local pode falhar — prefira colar uma URL hospedada."
+      );
     }
     setBusy(true);
     try {

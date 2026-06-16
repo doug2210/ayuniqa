@@ -671,11 +671,11 @@ function StageSymbolRow({
       )}
       {value.kind === "image" && (
         <ImageField
-          label="Imagem"
+            label="Imagem (SVG, PNG, GIF, JPG)"
           value={value.imageUrl ?? null}
           onChange={(v) => onChange({ imageUrl: v })}
-          accept="image/png,image/svg+xml,image/webp,image/jpeg"
-          uploadLabel="Upload"
+            accept="image/png,image/svg+xml,image/webp,image/jpeg,image/gif"
+            uploadLabel="Upload SVG/PNG/GIF"
         />
       )}
       <div className="grid gap-3 sm:grid-cols-6">
@@ -818,6 +818,9 @@ function GamesEditor({
               label="Cover image"
               value={o.cover ?? g.cover}
               onChange={(v) => updateGame(g.slug, { cover: v ?? undefined })}
+              accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+              placeholder="https://… (PNG, JPG, GIF, WebP, SVG)"
+              uploadLabel="Upload (PNG/JPG/GIF/SVG)"
             />
           </Card>
         );
