@@ -113,9 +113,6 @@ export function FloatingSlotItems({
     };
   }, []);
 
-  // The viewport "stage" cycles each item from below the fold up past the top.
-  const stage = vh + 240;
-
   return (
     <div
       ref={containerRef}
