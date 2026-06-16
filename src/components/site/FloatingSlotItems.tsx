@@ -12,18 +12,21 @@ export type FloatingItem = {
 };
 
 export const DEFAULT_FLOATING_ITEMS: FloatingItem[] = [
-  { symbol: "🍒", size: 44, speed: 0.55, opacity: 0.85, hue: 350 },
-  { symbol: "🍋", size: 40, speed: 0.7, opacity: 0.8, hue: 50 },
-  { symbol: "🔔", size: 46, speed: 0.45, opacity: 0.8, hue: 40 },
-  { symbol: "💎", size: 38, speed: 0.8, opacity: 0.9, hue: 190 },
-  { symbol: "7️⃣", size: 50, speed: 0.5, opacity: 0.85, hue: 0 },
-  { symbol: "⭐", size: 42, speed: 0.65, opacity: 0.8, hue: 45 },
-  { symbol: "🍀", size: 40, speed: 0.6, opacity: 0.85, hue: 130 },
-  { symbol: "🎰", size: 52, speed: 0.4, opacity: 0.8, hue: 280 },
-  { symbol: "🪙", size: 36, speed: 0.9, opacity: 0.85, hue: 45 },
-  { symbol: "🎲", size: 42, speed: 0.55, opacity: 0.8, hue: 310 },
-  { symbol: "👑", size: 44, speed: 0.5, opacity: 0.85, hue: 45 },
-  { symbol: "💰", size: 44, speed: 0.7, opacity: 0.85, hue: 130 },
+  { symbol: "🍒", size: 48, speed: 0.55, opacity: 0.95, hue: 350 },
+  { symbol: "🍋", size: 44, speed: 0.7, opacity: 0.9, hue: 50 },
+  { symbol: "🔔", size: 50, speed: 0.45, opacity: 0.9, hue: 40 },
+  { symbol: "💎", size: 42, speed: 0.8, opacity: 1.0, hue: 190 },
+  { symbol: "7️⃣", size: 54, speed: 0.5, opacity: 0.95, hue: 0 },
+  { symbol: "⭐", size: 46, speed: 0.65, opacity: 0.9, hue: 45 },
+  { symbol: "🍀", size: 44, speed: 0.6, opacity: 0.95, hue: 130 },
+  { symbol: "🎰", size: 56, speed: 0.4, opacity: 0.9, hue: 280 },
+  { symbol: "🪙", size: 40, speed: 0.9, opacity: 0.95, hue: 45 },
+  { symbol: "🎲", size: 46, speed: 0.55, opacity: 0.9, hue: 310 },
+  { symbol: "👑", size: 48, speed: 0.5, opacity: 0.95, hue: 45 },
+  { symbol: "💰", size: 48, speed: 0.7, opacity: 0.95, hue: 130 },
+  { symbol: "🃏", size: 44, speed: 0.6, opacity: 0.9, hue: 220 },
+  { symbol: "🎯", size: 46, speed: 0.75, opacity: 0.95, hue: 30 },
+  { symbol: "🔥", size: 50, speed: 0.5, opacity: 0.9, hue: 15 },
 ];
 
 type Placed = FloatingItem & {
@@ -45,7 +48,7 @@ function seededRandom(seed: number) {
 
 export function FloatingSlotItems({
   items = DEFAULT_FLOATING_ITEMS,
-  density = 1.6,
+  density = 2.2,
 }: {
   items?: FloatingItem[];
   density?: number;
@@ -55,6 +58,9 @@ export function FloatingSlotItems({
   const [vh, setVh] = useState(typeof window !== "undefined" ? window.innerHeight : 800);
   const rafRef = useRef<number | null>(null);
 
+  // The viewport "stage" cycles each item from below the fold up past the top.
+  const stage = vh + 240;
+
   // Build a stable layout of placed items (deterministic per render).
   const placed = useMemo<Placed[]>(() => {
     const rand = seededRandom(1337);
@@ -62,18 +68,26 @@ export function FloatingSlotItems({
     const out: Placed[] = [];
     for (let i = 0; i < count; i++) {
       const base = items[i % items.length];
+      // Place symbols on the left or right edge only so they never overlap content.
+      const side = i % 2 === 0 ? "left" : "right";
+      let leftVw: number;
+      if (side === "left") {
+        leftVw = rand() * 12; // 0-12vw
+      } else {
+        leftVw = 88 + rand() * 12; // 88-100vw
+      }
       out.push({
         ...base,
         id: i,
-        left: rand() * 96 + 2,
-        offset: rand() * 1200,
+        left: leftVw,
+        offset: rand() * stage,
         drift: 20 + rand() * 60,
         driftSpeed: 0.0008 + rand() * 0.0014,
         rotate: (rand() - 0.5) * 0.4,
       });
     }
     return out;
-  }, [items, density]);
+  }, [items, density, stage]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -99,14 +113,12 @@ export function FloatingSlotItems({
     };
   }, []);
 
-  // The viewport "stage" cycles each item from below the fold up past the top.
-  const stage = vh + 240;
-
   return (
     <div
       ref={containerRef}
       aria-hidden
-      className="pointer-events-none fixed inset-0 -z-[5] overflow-hidden"
+      className="pointer-events-none fixed inset-0 overflow-hidden"
+      style={{ zIndex: 10 }}
     >
       {placed.map((p) => {
         const speed = p.speed ?? 0.6;
@@ -116,8 +128,11 @@ export function FloatingSlotItems({
         const sway = Math.sin(traveled * p.driftSpeed) * p.drift;
         const rot = traveled * p.rotate;
         const filter = p.hue !== undefined
-          ? `drop-shadow(0 6px 18px hsl(${p.hue} 90% 60% / 0.35))`
+          ? `drop-shadow(0 8px 24px hsl(${p.hue} 90% 60% / 0.55))`
           : undefined;
+        const textShadow = p.hue !== undefined
+          ? `0 0 12px hsl(${p.hue} 90% 60% / 0.8), 0 0 24px hsl(${p.hue} 90% 60% / 0.5)`
+          : "0 0 12px rgba(255,255,255,0.6), 0 0 24px rgba(255,255,255,0.3)";
         return (
           <span
             key={p.id}
@@ -129,6 +144,7 @@ export function FloatingSlotItems({
               fontSize: `${p.size ?? 40}px`,
               opacity: p.opacity ?? 0.8,
               filter,
+              textShadow,
               willChange: "transform",
               userSelect: "none",
               lineHeight: 1,
