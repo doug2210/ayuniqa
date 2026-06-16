@@ -62,7 +62,7 @@ function Hero() {
               <a href={h.secondaryCta.href}>{h.secondaryCta.label}</a>
             </Button>
           </div>
-          <div className="mt-10 grid max-w-2xl grid-cols-3 gap-3 sm:gap-7">
+          <div className="relative z-10 mt-10 grid max-w-2xl grid-cols-3 gap-3 sm:gap-7">
             {h.stats.filter((s) => s.enabled).map((s, i) => (
               <Stat key={i} value={s.value} suffix={s.suffix} decimals={s.decimals} label={s.label} />
             ))}
@@ -83,8 +83,8 @@ function Hero() {
 
 function Stat({ value, suffix = "", decimals = 0, label }: { value: number; suffix?: string; decimals?: number; label: string }) {
   return (
-    <div>
-      <div className="text-5xl font-black leading-none text-gradient-brand sm:text-6xl lg:text-7xl">
+    <div className="relative z-10">
+      <div className="text-4xl font-black leading-none text-gradient-brand sm:text-5xl lg:text-6xl">
         <NumberTicker value={value} suffix={suffix} decimalPlaces={decimals} />
       </div>
       <div className="mt-2 text-sm font-bold uppercase tracking-wider text-muted-foreground">{label}</div>
