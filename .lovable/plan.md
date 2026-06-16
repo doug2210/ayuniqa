@@ -1,88 +1,80 @@
 ## Objetivo
 
-Transformar a rota `/admin` (hoje apenas um placeholder) em um painel funcional que edita o conteúdo do site em tempo real, **sem backend**. Toda a configuração fica no `localStorage` do seu navegador, então é perfeito para você visualizar trocas de assets, textos e ajustes nos símbolos flutuantes antes de plugar o Lovable Cloud depois.
+Sim, dá para editar os elementos do Hero individualmente. Hoje só o bloco "Textos do Hero" e os "Símbolos das laterais" são editáveis. Vou dividir o Hero em sub-abas e abrir controle fino do **HeroStage** (o quadro animado que reage ao mouse).
 
-## Arquitetura
+## Nova organização da aba "Hero" do admin
 
-```text
-src/
-  lib/
-    site-config.ts          ← tipos + defaults + load/save/reset (localStorage)
-  components/
-    site-config/
-      SiteConfigProvider.tsx ← Context que injeta config no app + listener cross-tab
-      useSiteConfig.ts       ← hook helper
-    admin/
-      AdminGate.tsx          ← modal de senha (sessão em localStorage)
-      AdminLayout.tsx        ← shell com abas
-      sections/
-        FloatingItemsEditor.tsx
-        HeroEditor.tsx
-        GamesEditor.tsx
-        BrandingEditor.tsx   ← parceiros, footer, contato
-      controls/
-        ImageField.tsx       ← upload local → dataURL (sem backend)
-        ColorField.tsx, NumberField.tsx, ListField.tsx
-  routes/
-    admin.tsx                ← AdminGate + AdminLayout
-```
+Sub-abas dentro de Hero:
 
-`SiteConfigProvider` envolve o app no `__root.tsx`. Cada componente do site (`FloatingSlotItems`, `HeroStage`, `Header`, `Footer`, `games.tsx`, etc.) passa a ler o config pelo hook, com fallback nos defaults atuais — então nada quebra se a chave do localStorage estiver vazia.
+1. **Textos** — o editor atual (badge, título, subtítulo, CTAs).
+2. **Stats** — os três números (Slot titles / Markets / Uptime): número, sufixo, decimais, label e on/off por item.
+3. **Badge inferior** — texto e on/off de "Studio of the year nominee".
+4. **Palco central (HeroStage)** — novo (ver abaixo).
+5. **Símbolos das laterais** — fica como aba separada de primeiro nível (já existe).
 
-## O que dá pra editar
+## Palco central (HeroStage) — novo editor
 
-**1. Símbolos flutuantes** (já existe estrutura; só falta a UI)
-- Lista de itens: símbolo (emoji/texto), tamanho, velocidade, opacidade, hue
-- Densidade global
-- Botão "Adicionar item", "Remover", "Restaurar padrão"
-- Preview ao vivo (o site abaixo do painel ou em nova aba reflete)
+### Miolo central (substitui os reels animados)
 
-**2. Hero da home**
-- Título, subtítulo, texto/links dos CTAs
-- Imagem/asset do hero (upload local → dataURL)
+Hoje o miolo é o slot animado. Vou trocar por um slot do tipo "personagem", com 3 opções de fonte:
 
-**3. Jogos** (`/games` e `/games/$slug`)
-- Lista editável: nome, slug, thumbnail (upload), descrição curta, descrição longa, tags
-- Reordenar, adicionar, remover
+- **Imagem custom** (upload PNG/SVG/JPG ou URL) — recomendada para o personagem.
+- **Reels animados** (comportamento atual, mantido como fallback).
+- **Nenhum** (só o halo + ícones flutuantes).
 
-**4. Branding / Footer / Contato**
-- Logos de parceiros (upload + nome + link)
-- Textos do footer, redes sociais
-- E-mail/telefone/endereço de contato
+Campos adicionais quando "Imagem custom":
+- `characterImageUrl` — upload/URL.
+- `characterScale` (50–120%) e `characterOffsetY` (-20% a +20%) para encaixar bem.
+- `characterShadow` on/off (mantém o glow atrás).
+- `parallaxStrength` (0–1) para controlar o quanto o personagem se move com o mouse.
 
-**5. Utilidades globais**
-- Botão **Exportar JSON** (baixa o config inteiro)
-- Botão **Importar JSON** (substitui o config)
-- Botão **Restaurar padrões** por seção e global
-- Toast confirmando "salvo" a cada mudança (debounce 300ms)
+> A flag `heroImageUrl` que já existe passa a alimentar `characterImageUrl` automaticamente (migração silenciosa no `mergeConfig`) e some do editor de Textos para evitar duplicidade.
 
-## Proteção
+### Ícones flutuantes ao redor do personagem
 
-- `AdminGate.tsx` mostra um modal pedindo senha antes de renderizar o painel.
-- Senha lida de `import.meta.env.VITE_ADMIN_PASSWORD` com fallback `"ayuniqa"` para desenvolvimento.
-- Sessão salva em `localStorage` (`ayuniqa.admin.session = true`) com botão "Sair" no header do painel.
-- Deixo um aviso visível: **"Proteção apenas client-side, troque por auth real ao ativar o Lovable Cloud."**
+Editor de lista (igual ao dos símbolos laterais), com Add/Remove/Reset para os 8 ícones atuais. Cada item tem:
 
-## Persistência
+- **Tipo**: `lucide` (escolher um nome — Crown, Diamond, Star, Cherry, Gem, Coins, Sparkles, Zap, …), `emoji` (texto livre) ou `image` (upload PNG/SVG).
+- **Posição** `x` / `y` em % (0–100) — sliders com preview ao vivo.
+- **Tamanho** (20–120 px).
+- **Tint** (orange / yellow / light / grey) ou cor custom (hex).
+- **Profundidade do parallax** (0–1).
+- **Delay** e **duração** da animação `floaty`.
 
-- Chave única: `ayuniqa.siteConfig.v1` (JSON).
-- `SiteConfigProvider` escuta `storage` event → mudanças em outra aba refletem no preview imediatamente.
-- Versionamento por `version` no JSON; se subir a versão depois, faço merge com defaults para não perder dados.
-- Imagens upadas viram **dataURL** dentro do mesmo JSON (limite ~5MB total no localStorage; aviso quando estiver perto).
+Botão "Reset palco" volta tudo aos 8 ícones default.
+
+### Badges decorativos do palco
+
+- "Mega Win" e "HTML5": texto editável + on/off + lado (esquerda/direita) cada.
 
 ## Detalhes técnicos
 
-- Tipos exportados em `lib/site-config.ts` (`SiteConfig`, `FloatingItem`, `GameEntry`, `Partner`, etc.) e os defaults vêm dos valores hoje hardcoded em cada componente — copio para lá e refatoro os componentes para consumir o hook.
-- `FloatingSlotItems` passa a aceitar `items`/`density` opcionais (já aceita) e, se não receber, lê do `useSiteConfig()`.
-- UI usa os componentes shadcn já presentes (`Tabs`, `Card`, `Input`, `Slider`, `Button`, `Dialog`, `Switch`, `Label`).
-- SSR-safe: leitura do localStorage só em `useEffect`; durante SSR usa defaults para evitar mismatch.
+- `src/lib/site-config.ts`
+  - `HeroConfig` ganha `stats: StatItem[]`, `award: { enabled; label }`, `stage: HeroStageConfig`.
+  - `HeroStageConfig = { mode: 'character' | 'reels' | 'none'; character?: { imageUrl; scale; offsetY; shadow; parallax }; symbols: HeroStageSymbol[]; badges: { megaWin: {enabled,label,side}; html5: {enabled,label,side} } }`.
+  - `HeroStageSymbol = { kind: 'lucide'|'emoji'|'image'; icon?: string; emoji?: string; imageUrl?: string|null; x; y; size; tint; color?; depth; delay; duration }`.
+  - `DEFAULT_HERO_STAGE` espelha os 8 símbolos e os 2 badges atuais.
+  - `mergeConfig` faz migração: se houver `hero.heroImageUrl` salvo, copia para `hero.stage.character.imageUrl` e troca `mode` para `character`.
 
-## Fora de escopo (fica para quando ligar o Lovable Cloud)
+- `src/components/site/HeroStage.tsx`
+  - Recebe `config` (vem do `useSiteConfig`).
+  - Substitui o array `SYMBOLS` por `config.stage.symbols` mapeado com um `iconMap` de Lucide.
+  - Quando `mode === 'character'` renderiza `<img>` central com scale/offset/parallax; quando `'reels'` mantém o código atual; quando `'none'` esconde o miolo.
+  - Badges "Mega Win" / "HTML5" leem do config (texto, on/off, lado).
 
-- Auth real, multiusuário, RLS.
-- Upload de imagem para CDN/storage (por ora vira dataURL).
-- Aprovações de parceiros, mensagens de contato persistentes, analytics.
+- `src/routes/index.tsx`
+  - Stats deixam de ser hardcoded e iteram sobre `h.stats`.
+  - O `Trophy` badge passa por `h.award.enabled` e `h.award.label`.
+  - Remove o branch `h.heroImageUrl ? <img/> : <HeroStage/>` (a imagem agora é só o miolo).
 
-## Entrega
+- `src/components/admin/AdminPanel.tsx`
+  - Aba "Hero" vira `Tabs` internos: Textos / Stats / Badge / Palco.
+  - Novos componentes: `HeroStatsEditor`, `HeroAwardEditor`, `HeroStageEditor` (com `CharacterEditor`, `StageSymbolsEditor`, `StageBadgesEditor`).
+  - Reaproveita `ImageField`, `NumberField` e `Slider` existentes.
+  - Para escolher ícone Lucide, um `<Select>` simples com a lista permitida (não importa o pacote inteiro).
 
-Ao terminar: navegar para `/admin`, digitar senha, trocar um símbolo / hero / jogo e ver atualizar na home em tempo real (mesma aba ou outra aba).
+## Fora do escopo
+
+- Não vou tornar as cores/animações dos particles e do halo conic editáveis (mantém visual coeso).
+- Strips dos reels antigos continuam fixos — só importam quando você escolher `mode: 'reels'`.
+- Sem mudanças no resto do site (Strengths, Featured games, Services, CTA).

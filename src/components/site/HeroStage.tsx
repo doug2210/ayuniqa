@@ -1,28 +1,15 @@
 import { useEffect, useRef, useState, useMemo } from "react";
-import { Crown, Diamond, Star, Cherry, Gem, Sparkles, Coins, Zap } from "lucide-react";
+import {
+  Crown, Diamond, Star, Cherry, Gem, Sparkles, Coins, Zap,
+  Trophy, Heart, Flame, Bell, Award, Rocket,
+} from "lucide-react";
+import { useSiteConfig } from "@/components/site-config/SiteConfigProvider";
+import type { HeroStageSymbol, StageTint, StageIconName } from "@/lib/site-config";
 
-type Symbol = {
-  icon: typeof Crown;
-  label?: string;
-  x: number; // %
-  y: number; // %
-  size: number; // px
-  delay: number;
-  duration: number;
-  tint: "orange" | "yellow" | "light" | "grey";
-  depth: number; // 0..1 parallax strength
+const ICON_MAP: Record<StageIconName, typeof Crown> = {
+  Crown, Diamond, Star, Cherry, Gem, Coins, Sparkles, Zap,
+  Trophy, Heart, Flame, Bell, Award, Rocket,
 };
-
-const SYMBOLS: Symbol[] = [
-  { icon: Crown,    x: 12, y: 14, size: 56, delay: 0.0, duration: 7.2, tint: "orange", depth: 1.0 },
-  { icon: Diamond,  x: 82, y: 10, size: 44, delay: 0.6, duration: 6.4, tint: "light",  depth: 0.8 },
-  { icon: Star,     x: 90, y: 58, size: 38, delay: 1.1, duration: 5.8, tint: "yellow", depth: 0.6 },
-  { icon: Cherry,   x: 18, y: 78, size: 50, delay: 0.3, duration: 7.0, tint: "orange", depth: 0.9 },
-  { icon: Gem,      x: 70, y: 84, size: 42, delay: 1.4, duration: 6.8, tint: "light",  depth: 0.7 },
-  { icon: Coins,    x: 6,  y: 46, size: 36, delay: 0.9, duration: 6.2, tint: "yellow", depth: 0.5 },
-  { icon: Sparkles, x: 50, y: 4,  size: 28, delay: 1.7, duration: 5.2, tint: "light",  depth: 0.4 },
-  { icon: Zap,      x: 96, y: 36, size: 30, delay: 2.0, duration: 5.6, tint: "orange", depth: 0.55 },
-];
 
 const REEL_STRIPS = [
   ["7", "★", "♦", "BAR", "♛", "🍒", "💎"],
@@ -39,16 +26,20 @@ const PARTICLES = Array.from({ length: 26 }, (_, i) => ({
   duration: 6 + ((i * 3) % 7),
 }));
 
-function tintVar(t: Symbol["tint"]) {
+function tintVar(t: StageTint, custom?: string) {
   switch (t) {
     case "orange": return "var(--brand-orange)";
     case "yellow": return "var(--brand-yellow)";
     case "light":  return "var(--brand-light-orange)";
-    default:       return "var(--brand-grey)";
+    case "grey":   return "var(--brand-grey)";
+    case "custom": return custom || "var(--brand-orange)";
+    default:       return "var(--brand-orange)";
   }
 }
 
 export function HeroStage() {
+  const { config } = useSiteConfig();
+  const stage = config.hero.stage;
   const ref = useRef<HTMLDivElement>(null);
   const [parallax, setParallax] = useState({ x: 0, y: 0 });
 
@@ -147,6 +138,7 @@ export function HeroStage() {
       </div>
 
       {/* Center reel stage */}
+      {stage.mode === "reels" && (
       <div
         className="absolute left-1/2 top-1/2 w-[58%]"
         style={{
@@ -216,20 +208,55 @@ export function HeroStage() {
         </div>
 
       </div>
+      )}
+
+      {/* Center character image */}
+      {stage.mode === "character" && stage.character.imageUrl && (
+        <div
+          className="absolute left-1/2 top-1/2"
+          style={{
+            width: `${stage.character.scale}%`,
+            transform: `translate(-50%, calc(-50% + ${stage.character.offsetY}%)) translate(${parallax.x * 30 * stage.character.parallax}px, ${parallax.y * 30 * stage.character.parallax}px)`,
+            transition: "transform 0.25s ease-out",
+            maxWidth: "85%",
+          }}
+        >
+          <img
+            src={stage.character.imageUrl}
+            alt=""
+            draggable={false}
+            className="mx-auto h-auto w-full object-contain"
+            style={{
+              filter: stage.character.shadow
+                ? "drop-shadow(0 20px 40px color-mix(in oklab, var(--brand-orange) 45%, transparent))"
+                : undefined,
+            }}
+          />
+        </div>
+      )}
 
       {/* Floating chip badges — placed on the outer stage so they don't unbalance the centered reel box */}
-      <div className="pointer-events-none absolute left-[14%] top-[28%] z-20 -rotate-6 rounded-2xl bg-[color:var(--brand-yellow)] px-3 py-2 text-[10px] font-black uppercase tracking-widest text-[color:var(--brand-grey)] shadow-card animate-float">
-        Mega Win
-      </div>
-      <div className="pointer-events-none absolute right-[12%] bottom-[26%] z-20 rotate-6 rounded-full bg-gradient-brand px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-glow">
-        HTML5
-      </div>
+      {stage.badges.megaWin.enabled && (
+        <div
+          className={`pointer-events-none absolute top-[28%] z-20 -rotate-6 rounded-2xl bg-[color:var(--brand-yellow)] px-3 py-2 text-[10px] font-black uppercase tracking-widest text-[color:var(--brand-grey)] shadow-card animate-float ${stage.badges.megaWin.side === "right" ? "right-[14%]" : "left-[14%]"}`}
+        >
+          {stage.badges.megaWin.label}
+        </div>
+      )}
+      {stage.badges.html5.enabled && (
+        <div
+          className={`pointer-events-none absolute bottom-[26%] z-20 rotate-6 rounded-full bg-gradient-brand px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-glow ${stage.badges.html5.side === "left" ? "left-[12%]" : "right-[12%]"}`}
+        >
+          {stage.badges.html5.label}
+        </div>
+      )}
 
       {/* Floating icon symbols */}
-      {SYMBOLS.map((s, i) => {
-        const Icon = s.icon;
+      {stage.symbols.map((s: HeroStageSymbol, i: number) => {
         const px = parallax.x * 30 * s.depth;
         const py = parallax.y * 30 * s.depth;
+        const color = tintVar(s.tint, s.color);
+        const Icon = s.kind === "lucide" ? (ICON_MAP[s.icon ?? "Star"] ?? Star) : null;
         return (
           <div
             key={i}
@@ -253,11 +280,24 @@ export function HeroStage() {
                 style={{
                   width: s.size,
                   height: s.size,
-                  color: tintVar(s.tint),
-                  boxShadow: `0 10px 30px -10px ${tintVar(s.tint)}`,
+                  color,
+                  boxShadow: `0 10px 30px -10px ${color}`,
                 }}
               >
-                <Icon style={{ width: s.size * 0.5, height: s.size * 0.5 }} />
+                {s.kind === "lucide" && Icon && (
+                  <Icon style={{ width: s.size * 0.5, height: s.size * 0.5 }} />
+                )}
+                {s.kind === "emoji" && (
+                  <span style={{ fontSize: s.size * 0.55, lineHeight: 1 }}>{s.emoji || "✨"}</span>
+                )}
+                {s.kind === "image" && s.imageUrl && (
+                  <img
+                    src={s.imageUrl}
+                    alt=""
+                    draggable={false}
+                    style={{ width: s.size * 0.7, height: s.size * 0.7, objectFit: "contain" }}
+                  />
+                )}
               </div>
             </div>
           </div>
