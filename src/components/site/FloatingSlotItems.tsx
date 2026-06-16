@@ -102,9 +102,13 @@ export function FloatingSlotItems({
         rafRef.current = null;
       });
     };
-    const onResize = () => setVh(window.innerHeight);
+    const onResize = () => {
+      setVh(window.innerHeight);
+      setVw(window.innerWidth);
+    };
     setScrollY(window.scrollY);
     setVh(window.innerHeight);
+    setVw(window.innerWidth);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
     return () => {
