@@ -28,6 +28,9 @@ function Admin() {
           <p className="mt-3 text-muted-foreground">
             The admin panel will be activated once the backend is connected. You'll manage games, assets, partner approvals, messages and site content from here.
           </p>
+          <p className="mt-3 text-sm text-muted-foreground/80">
+            Floating slot symbols are configurable here too — symbol set, density, speed and color glow. Defaults live in <code className="rounded bg-muted px-1.5 py-0.5">FloatingSlotItems.tsx</code> until the backend goes live.
+          </p>
           <Button asChild className="mt-8 bg-gradient-brand text-white">
             <Link to="/">Back to site</Link>
           </Button>
