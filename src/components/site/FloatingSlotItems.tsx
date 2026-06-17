@@ -28,9 +28,12 @@ export function FloatingSlotItems({
   items?: FloatingItem[];
   density?: number;
 }) {
-  const { config } = useSiteConfig();
+  const { config, loaded } = useSiteConfig();
   const effectiveItems = items ?? config.floating.items;
   const effectiveDensity = density ?? config.floating.density;
+  // Avoid a flash of stale default icons before the Supabase config arrives.
+  // When items are provided as a prop, render immediately (caller controls the data).
+  const shouldRender = items !== undefined || loaded;
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollY, setScrollY] = useState(0);
   const [vh, setVh] = useState(typeof window !== "undefined" ? window.innerHeight : 800);
