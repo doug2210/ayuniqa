@@ -12,6 +12,8 @@ import {
   Sparkles,
   Gamepad2,
   MessageSquare,
+  Info,
+  Share2,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -29,6 +31,9 @@ import {
   DEFAULT_HERO_STAGE,
   DEFAULT_STATS,
   DEFAULT_AWARD,
+  DEFAULT_ABOUT,
+  DEFAULT_SOCIAL,
+  SOCIAL_PLATFORMS,
   STAGE_ICON_NAMES,
   type FloatingConfig,
   type GameOverride,
@@ -39,6 +44,10 @@ import {
   type StatItem,
   type AwardBadge,
   type StageTint,
+  type AboutConfig,
+  type AboutStat,
+  type SocialLink,
+  type SocialPlatform,
 } from "@/lib/site-config";
 import { DEFAULT_FLOATING_ITEMS, type FloatingItem } from "@/lib/site-config";
 import { ImageField } from "./ImageField";
@@ -125,11 +134,13 @@ export function AdminPanel() {
       </header>
 
       <Tabs defaultValue="floating">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
           <TabsTrigger value="floating"><Sparkles className="!size-3.5" /> Symbols</TabsTrigger>
           <TabsTrigger value="hero"><Settings2 className="!size-3.5" /> Hero</TabsTrigger>
           <TabsTrigger value="games"><Gamepad2 className="!size-3.5" /> Games</TabsTrigger>
+          <TabsTrigger value="about"><Info className="!size-3.5" /> About</TabsTrigger>
           <TabsTrigger value="contact"><MessageSquare className="!size-3.5" /> Contact</TabsTrigger>
+          <TabsTrigger value="social"><Share2 className="!size-3.5" /> Social</TabsTrigger>
         </TabsList>
 
         <TabsContent value="floating" className="mt-6">
@@ -157,6 +168,20 @@ export function AdminPanel() {
           <ContactEditor
             value={config.contact}
             onChange={(next) => setConfig((c) => ({ ...c, contact: next }))}
+          />
+        </TabsContent>
+
+        <TabsContent value="about" className="mt-6">
+          <AboutEditor
+            value={config.about}
+            onChange={(next) => setConfig((c) => ({ ...c, about: next }))}
+          />
+        </TabsContent>
+
+        <TabsContent value="social" className="mt-6">
+          <SocialEditor
+            value={config.social}
+            onChange={(next) => setConfig((c) => ({ ...c, social: next }))}
           />
         </TabsContent>
       </Tabs>
