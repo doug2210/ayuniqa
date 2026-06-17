@@ -23,7 +23,17 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Card } from "@/components/ui/card";
 import { useSiteConfig } from "@/components/site-config/SiteConfigProvider";
-import { games as defaultGames } from "@/lib/games-data";
+import {
+  useGames,
+  useUpsertGame,
+  useDeleteGame,
+  emptyGame,
+  GAME_CATEGORIES,
+  GAME_VOLATILITIES,
+  type GameInput,
+  type DbGame,
+} from "@/lib/games-api";
+import { useState } from "react";
 import {
   DEFAULT_HERO,
   DEFAULT_CONTACT,
@@ -36,7 +46,6 @@ import {
   SOCIAL_PLATFORMS,
   STAGE_ICON_NAMES,
   type FloatingConfig,
-  type GameOverride,
   type SiteConfig,
   type HeroStageConfig,
   type HeroStageSymbol,
