@@ -15,6 +15,8 @@ type Ctx = {
 
 const SiteConfigContext = createContext<Ctx | null>(null);
 
+const BROADCAST_CHANNEL = "ayuniqa.siteConfig.v1";
+
 export function SiteConfigProvider({ children }: { children: ReactNode }) {
   const [config, setConfigState] = useState<SiteConfig>(DEFAULT_SITE_CONFIG);
   const [loaded, setLoaded] = useState(false);
@@ -46,22 +48,22 @@ export function SiteConfigProvider({ children }: { children: ReactNode }) {
       .maybeSingle()
       .then(({ data }) => applyRow(data ?? null));
 
-    // Live updates: any admin save in any tab/device propagates instantly here.
-    const channel = supabase
-      .channel("site_config_changes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "site_config", filter: `id=eq.${SITE_CONFIG_ROW_ID}` },
-        (payload) => {
-          const next = (payload.new as { data?: unknown } | null) ?? null;
-          if (next && "data" in next) applyRow(next as { data: unknown });
-        },
-      )
-      .subscribe();
+    // Cross-tab live updates via BroadcastChannel (no backend realtime needed).
+    let bc: BroadcastChannel | null = null;
+    try {
+      bc = new BroadcastChannel(BROADCAST_CHANNEL);
+      bc.onmessage = (ev) => {
+        const value = ev.data;
+        if (cancelled || !value) return;
+        setConfigState(mergeConfig(value));
+      };
+    } catch {
+      // BroadcastChannel unsupported — same-tab updates still work via setState.
+    }
 
     return () => {
       cancelled = true;
-      void supabase.removeChannel(channel);
+      bc?.close();
     };
   }, []);
 
@@ -75,6 +77,14 @@ export function SiteConfigProvider({ children }: { children: ReactNode }) {
         .then(({ error }) => {
           if (error) console.warn("[site_config] save failed:", error.message);
         });
+      // Notify other tabs in the same browser instantly.
+      try {
+        const bc = new BroadcastChannel(BROADCAST_CHANNEL);
+        bc.postMessage(value);
+        bc.close();
+      } catch {
+        // ignore
+      }
       return value;
     });
   }, []);
@@ -84,6 +94,13 @@ export function SiteConfigProvider({ children }: { children: ReactNode }) {
     void supabase
       .from("site_config")
       .upsert({ id: SITE_CONFIG_ROW_ID, data: {} as Record<string, unknown>, updated_at: new Date().toISOString() });
+    try {
+      const bc = new BroadcastChannel(BROADCAST_CHANNEL);
+      bc.postMessage(DEFAULT_SITE_CONFIG);
+      bc.close();
+    } catch {
+      // ignore
+    }
   }, []);
 
   return (
