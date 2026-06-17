@@ -7,6 +7,8 @@ import { useSiteConfig } from "@/components/site-config/SiteConfigProvider";
 import { mergedGames } from "@/lib/site-config";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
 import { BorderBeam } from "@/components/magicui/border-beam";
+import { GameTrailer, GameScreenshots, PlayDemoButton } from "@/components/site/GameMedia";
+import { GameAssetsBrowser } from "@/components/site/GameAssetsBrowser";
 
 export const Route = createFileRoute("/games/$slug")({
   loader: ({ params }) => {
@@ -100,6 +102,7 @@ function GameDetail() {
             </div>
 
             <div className="mt-10 flex flex-wrap gap-3">
+              <PlayDemoButton url={game.demoUrl} title={game.title} />
               <Button asChild size="lg" variant="shimmer">
                 <Link to="/contact">Request demo</Link>
               </Button>
@@ -110,6 +113,33 @@ function GameDetail() {
           </div>
         </ScrollReveal>
       </section>
+
+      {game.trailerUrl && (
+        <section className="mx-auto max-w-5xl px-4 pb-12 sm:px-6 lg:px-8">
+          <ScrollReveal animation="fade-up">
+            <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">
+              Trailer
+            </h3>
+            <GameTrailer url={game.trailerUrl} title={game.title} />
+          </ScrollReveal>
+        </section>
+      )}
+
+      {game.screenshots && game.screenshots.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
+          <ScrollReveal animation="fade-up">
+            <GameScreenshots shots={game.screenshots} title={game.title} />
+          </ScrollReveal>
+        </section>
+      )}
+
+      {game.assets && game.assets.length > 0 && (
+        <section className="mx-auto max-w-5xl px-4 pb-20 sm:px-6 lg:px-8">
+          <ScrollReveal animation="fade-up">
+            <GameAssetsBrowser assets={game.assets} gameSlug={game.slug} />
+          </ScrollReveal>
+        </section>
+      )}
     </SiteLayout>
   );
 }
