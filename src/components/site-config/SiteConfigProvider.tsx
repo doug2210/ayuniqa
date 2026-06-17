@@ -50,20 +50,25 @@ export function SiteConfigProvider({ children }: { children: ReactNode }) {
 
     // Cross-tab live updates via BroadcastChannel (no backend realtime needed).
     let bc: BroadcastChannel | null = null;
+    const handleMessage = (ev: MessageEvent) => {
+      const value = ev.data;
+      if (cancelled || !value) return;
+      setConfigState(mergeConfig(value));
+    };
     try {
       bc = new BroadcastChannel(BROADCAST_CHANNEL);
-      bc.onmessage = (ev) => {
-        const value = ev.data;
-        if (cancelled || !value) return;
-        setConfigState(mergeConfig(value));
-      };
+      bc.addEventListener("message", handleMessage);
     } catch {
       // BroadcastChannel unsupported — same-tab updates still work via setState.
     }
 
     return () => {
       cancelled = true;
-      bc?.close();
+      if (bc) {
+        bc.removeEventListener("message", handleMessage);
+        bc.close();
+        bc = null;
+      }
     };
   }, []);
 
