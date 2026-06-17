@@ -43,6 +43,7 @@ import {
 import { DEFAULT_FLOATING_ITEMS, type FloatingItem } from "@/lib/site-config";
 import { ImageField } from "./ImageField";
 import { adminSignOut } from "./AdminGate";
+import { GameAssetUploader } from "./GameAssetUploader";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -822,9 +823,99 @@ function GamesEditor({
               placeholder="https://… (PNG, JPG, GIF, WebP, SVG)"
               uploadLabel="Upload (PNG/JPG/GIF/SVG)"
             />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <Label>Trailer URL (YouTube, Vimeo ou .mp4)</Label>
+                <Input
+                  value={o.trailerUrl ?? ""}
+                  onChange={(e) => updateGame(g.slug, { trailerUrl: e.target.value || null })}
+                  placeholder="https://www.youtube.com/watch?v=…"
+                />
+              </div>
+              <div>
+                <Label>Play-demo URL (iframe)</Label>
+                <Input
+                  value={o.demoUrl ?? ""}
+                  onChange={(e) => updateGame(g.slug, { demoUrl: e.target.value || null })}
+                  placeholder="https://demo.exemplo.com/jogo"
+                />
+              </div>
+            </div>
+
+            <ScreenshotsEditor
+              value={o.screenshots ?? []}
+              onChange={(next) => updateGame(g.slug, { screenshots: next })}
+            />
+
+            <GameAssetUploader
+              slug={g.slug}
+              assets={o.assets ?? []}
+              onChange={(next) => updateGame(g.slug, { assets: next })}
+            />
           </Card>
         );
       })}
+    </div>
+  );
+}
+
+/* ---------- Screenshots editor ---------- */
+
+function ScreenshotsEditor({
+  value,
+  onChange,
+}: {
+  value: string[];
+  onChange: (next: string[]) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+          Screenshots ({value.length})
+        </Label>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => onChange([...value, ""])}
+        >
+          <Plus className="!size-3.5" /> Add screenshot
+        </Button>
+      </div>
+      {value.length === 0 && (
+        <p className="rounded-lg border border-dashed border-border p-3 text-center text-xs text-muted-foreground">
+          Nenhuma screenshot. Adicione URLs ou faça upload via campo de imagem.
+        </p>
+      )}
+      <div className="space-y-2">
+        {value.map((src, i) => (
+          <div key={i} className="rounded-lg border border-border p-3">
+            <ImageField
+              label={`Screenshot ${i + 1}`}
+              value={src}
+              onChange={(v) => {
+                const next = [...value];
+                next[i] = v ?? "";
+                onChange(next);
+              }}
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              placeholder="https://… ou faça upload"
+              uploadLabel="Upload screenshot"
+            />
+            <div className="mt-2 text-right">
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() => onChange(value.filter((_, idx) => idx !== i))}
+              >
+                <Trash2 className="!size-3.5 text-destructive" /> Remover
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
