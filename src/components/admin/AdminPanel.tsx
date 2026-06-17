@@ -789,6 +789,7 @@ function GamesEditor() {
   const del = useDeleteGame();
   const DRAFT_KEY = "ayuniqa.admin.gameDraft.v1";
   const [editing, setEditing] = useState<GameInput | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Restore in-progress draft after accidental reloads / remounts.
   useEffect(() => {
@@ -816,28 +817,24 @@ function GamesEditor() {
     }
   }, [editing]);
 
-  // Warn before navigating away with unsaved work.
-  useEffect(() => {
-    if (!editing) return;
-    const handler = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = "";
-    };
-    window.addEventListener("beforeunload", handler);
-    return () => window.removeEventListener("beforeunload", handler);
-  }, [editing]);
-
   const clearDraft = () => {
     try {
       window.localStorage.removeItem(DRAFT_KEY);
     } catch {
       // ignore
     }
+    setSaveError(null);
     setEditing(null);
   };
 
-  const startEdit = (g: DbGame) => setEditing({ ...g });
-  const startNew = () => setEditing(emptyGame());
+  const startEdit = (g: DbGame) => {
+    setSaveError(null);
+    setEditing({ ...g });
+  };
+  const startNew = () => {
+    setSaveError(null);
+    setEditing(emptyGame());
+  };
 
   if (editing) {
     return (
@@ -849,14 +846,16 @@ function GamesEditor() {
           clearDraft();
         }}
         onSave={async () => {
+          setSaveError(null);
           try {
             await upsert.mutateAsync(editing);
             clearDraft();
           } catch (err) {
-            alert("Save failed: " + (err instanceof Error ? err.message : String(err)));
+            setSaveError(err instanceof Error ? err.message : "Save failed. Please try again.");
           }
         }}
         saving={upsert.isPending}
+        error={saveError}
       />
     );
   }
