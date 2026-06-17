@@ -10,22 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ServicesRouteImport } from './routes/services'
-import { Route as GamesRouteImport } from './routes/games'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ClientZoneRouteImport } from './routes/client-zone'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GamesIndexRouteImport } from './routes/games.index'
 import { Route as GamesSlugRouteImport } from './routes/games.$slug'
 
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GamesRoute = GamesRouteImport.update({
-  id: '/games',
-  path: '/games',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -53,10 +48,15 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GamesIndexRoute = GamesIndexRouteImport.update({
+  id: '/games/',
+  path: '/games/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GamesSlugRoute = GamesSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => GamesRoute,
+  id: '/games/$slug',
+  path: '/games/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -65,9 +65,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/client-zone': typeof ClientZoneRoute
   '/contact': typeof ContactRoute
-  '/games': typeof GamesRouteWithChildren
   '/services': typeof ServicesRoute
   '/games/$slug': typeof GamesSlugRoute
+  '/games/': typeof GamesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,9 +75,9 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/client-zone': typeof ClientZoneRoute
   '/contact': typeof ContactRoute
-  '/games': typeof GamesRouteWithChildren
   '/services': typeof ServicesRoute
   '/games/$slug': typeof GamesSlugRoute
+  '/games': typeof GamesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,9 +86,9 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/client-zone': typeof ClientZoneRoute
   '/contact': typeof ContactRoute
-  '/games': typeof GamesRouteWithChildren
   '/services': typeof ServicesRoute
   '/games/$slug': typeof GamesSlugRoute
+  '/games/': typeof GamesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -98,9 +98,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/client-zone'
     | '/contact'
-    | '/games'
     | '/services'
     | '/games/$slug'
+    | '/games/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -108,9 +108,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/client-zone'
     | '/contact'
-    | '/games'
     | '/services'
     | '/games/$slug'
+    | '/games'
   id:
     | '__root__'
     | '/'
@@ -118,9 +118,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/client-zone'
     | '/contact'
-    | '/games'
     | '/services'
     | '/games/$slug'
+    | '/games/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -129,8 +129,9 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   ClientZoneRoute: typeof ClientZoneRoute
   ContactRoute: typeof ContactRoute
-  GamesRoute: typeof GamesRouteWithChildren
   ServicesRoute: typeof ServicesRoute
+  GamesSlugRoute: typeof GamesSlugRoute
+  GamesIndexRoute: typeof GamesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -140,13 +141,6 @@ declare module '@tanstack/react-router' {
       path: '/services'
       fullPath: '/services'
       preLoaderRoute: typeof ServicesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/games': {
-      id: '/games'
-      path: '/games'
-      fullPath: '/games'
-      preLoaderRoute: typeof GamesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -184,25 +178,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/games/': {
+      id: '/games/'
+      path: '/games'
+      fullPath: '/games/'
+      preLoaderRoute: typeof GamesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/games/$slug': {
       id: '/games/$slug'
-      path: '/$slug'
+      path: '/games/$slug'
       fullPath: '/games/$slug'
       preLoaderRoute: typeof GamesSlugRouteImport
-      parentRoute: typeof GamesRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-interface GamesRouteChildren {
-  GamesSlugRoute: typeof GamesSlugRoute
-}
-
-const GamesRouteChildren: GamesRouteChildren = {
-  GamesSlugRoute: GamesSlugRoute,
-}
-
-const GamesRouteWithChildren = GamesRoute._addFileChildren(GamesRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -210,8 +201,9 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   ClientZoneRoute: ClientZoneRoute,
   ContactRoute: ContactRoute,
-  GamesRoute: GamesRouteWithChildren,
   ServicesRoute: ServicesRoute,
+  GamesSlugRoute: GamesSlugRoute,
+  GamesIndexRoute: GamesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
