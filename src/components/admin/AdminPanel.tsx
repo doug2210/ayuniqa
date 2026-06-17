@@ -930,12 +930,14 @@ function GameForm({
   onCancel,
   onSave,
   saving,
+  error,
 }: {
   value: GameInput;
   onChange: (v: GameInput) => void;
   onCancel: () => void;
   onSave: () => void;
   saving: boolean;
+  error: string | null;
 }) {
   const set = <K extends keyof GameInput>(k: K, v: GameInput[K]) =>
     onChange({ ...value, [k]: v });
@@ -953,6 +955,11 @@ function GameForm({
           </Button>
         </div>
       </div>
+      {error && (
+        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          Save failed: {error}
+        </p>
+      )}
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
