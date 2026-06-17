@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
 import { TiltCard } from "@/components/site/TiltCard";
 
-export const Route = createFileRoute("/games")({
+export const Route = createFileRoute("/games/")({
   head: () => ({
     meta: [
       { title: "Games — Ayuniqa Studios" },
