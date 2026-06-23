@@ -138,19 +138,17 @@ export function HeroStage() {
         ))}
       </div>
 
-      {/* Center astronaut mascot (default stage) */}
-      {stage.mode === "reels" && (
-        <div
-          className="absolute left-1/2 top-1/2 w-[62%] -translate-x-1/2 -translate-y-1/2"
-          style={{
-            transform: `translate(-50%, -50%) translate(${parallax.x * 18}px, ${parallax.y * 18}px) rotateX(${parallax.y * -6}deg) rotateY(${parallax.x * 8}deg)`,
-            transition: "transform 0.25s ease-out",
-            transformStyle: "preserve-3d",
-          }}
-        >
-          <AstronautMascot className="h-auto w-full" />
-        </div>
-      )}
+      {/* Center astronaut mascot */}
+      <div
+        className="absolute left-1/2 top-1/2 w-[62%] -translate-x-1/2 -translate-y-1/2"
+        style={{
+          transform: `translate(-50%, -50%) translate(${parallax.x * 18}px, ${parallax.y * 18}px) rotateX(${parallax.y * -6}deg) rotateY(${parallax.x * 8}deg)`,
+          transition: "transform 0.25s ease-out",
+          transformStyle: "preserve-3d",
+        }}
+      >
+        <AstronautMascot className="h-auto w-full" />
+      </div>
 
       {/* Center character image */}
       {stage.mode === "character" && stage.character.imageUrl && (
