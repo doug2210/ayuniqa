@@ -54,7 +54,7 @@ export function AstronautMascot({ className }: AstronautMascotProps) {
       />
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-[-25%] rounded-full bg-[radial-gradient(circle,hsl(var(--primary)/0.35),transparent_70%)]"
+        className="pointer-events-none absolute inset-[-25%] rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--primary)_35%,transparent),transparent_70%)]"
       />
       <img
         ref={imgRef}
@@ -62,7 +62,7 @@ export function AstronautMascot({ className }: AstronautMascotProps) {
         alt="Ayuniqa astronaut"
         width={96}
         height={96}
-        className="relative h-full w-full object-contain drop-shadow-[0_0_10px_hsl(var(--primary)/0.55)] transition-transform duration-150 ease-out will-change-transform"
+        className="relative h-full w-full object-contain drop-shadow-[0_0_10px_color-mix(in_oklab,var(--primary)_55%,transparent)] transition-transform duration-150 ease-out will-change-transform"
       />
     </span>
   );
