@@ -1,28 +1,46 @@
-## Problema
+# Astronauta interativo no header
 
-O `SiteConfigProvider` inicializa com `DEFAULT_SITE_CONFIG` (que contém ícones antigos hardcoded: 💎, 7️⃣, 🎰, etc.) e só depois busca o config real do Supabase. O resultado é que, ao abrir a página, esses defaults renderizam por alguns milissegundos antes de serem substituídos pelo estado atual — o usuário vê um "flash" dos ícones antigos.
+## O que muda
 
-Além disso, há texto obsoleto no painel admin que diz não haver backend conectado, apesar do Supabase já estar funcionando.
+Substituir a imagem do logo atual (`ayuniqa-logo.png`) no `Header.tsx` por uma ilustração de astronauta no mesmo estilo da referência enviada (sticker holográfico, com aberração cromática vermelho/ciano, traços marcados).
 
-## Plano
+## Como será feito
 
-### 1. Suprimir flash dos floating icons
+### 1. Gerar a arte do astronauta
+- Usar `imagegen` (premium) para criar um astronauta em pose flutuando, estilo sticker/illustration com efeito de aberração cromática vermelho-ciano igual à referência, sobre fundo transparente (PNG).
+- Salvar como `src/assets/astronaut.png` e registrar como asset via `lovable-assets` para servir pelo CDN.
+- Em seguida, gerar uma **segunda imagem** com apenas a **viseira/capacete** isolada (mesmo estilo, mesma escala, fundo transparente), para que ela possa ser sobreposta e rotacionada independentemente sobre o corpo.
 
-- **Arquivo:** `src/components/site-config/SiteConfigProvider.tsx`
-  - Adicionar `loaded: boolean` no contexto, inicialmente `false`.
-  - Setar `loaded = true` após a primeira resposta do Supabase (mesmo em caso de erro ou dados vazios — "já tentei, pode usar defaults").
-  - Expor `loaded` no retorno de `useSiteConfig()`.
+> Alternativa: se isolar o capacete via imagegen ficar incoerente, faço o capacete como uma camada CSS — um círculo escuro com gradiente "espelhado" + estrelinhas — posicionado por cima do corpo. Decido durante a implementação com base no resultado da geração.
 
-- **Arquivo:** `src/components/site/FloatingSlotItems.tsx`
-  - Ler `loaded` do contexto.
-  - Se `!loaded` e nenhuma prop `items` foi passada, retornar `null` — nada aparece até que o config real esteja disponível.
+### 2. Novo componente `AstronautMascot.tsx`
+Componente cliente em `src/components/site/AstronautMascot.tsx`:
+- Wrapper `relative` com tamanho responsivo (≈ `h-10 sm:h-12`).
+- Camada base: corpo do astronauta.
+- Camada sobreposta: capacete, posicionado absolutamente sobre a cabeça, com `transform: rotate(Xdeg)` controlado por estado.
+- Listener global `mousemove` (com `requestAnimationFrame` para throttle) calcula o ângulo entre o centro do capacete e o cursor → aplica rotação limitada (ex.: ±18°) para parecer natural, não uma "hélice".
+- Cleanup do listener no unmount.
+- Sem rotação em telas `prefers-reduced-motion` (acessibilidade) — fica estático.
 
-### 2. Remover texto obsoleto do admin
+### 3. Efeito de luz laranja
+- Glow laranja pulsante atrás do astronauta usando `box-shadow`/`radial-gradient` com a cor `--primary` (laranja do projeto) — `blur-2xl opacity-60 animate-pulse`.
+- Leve `drop-shadow` laranja no `img` para dar o brilho holográfico.
+- Hover: intensifica o glow e aplica um pequeno `scale(1.05)`.
 
-- **Arquivo:** `src/components/admin/AdminPanel.tsx` (linha ~106)
-  - Remover o trecho: `"Changes save instantly to your browser. No backend yet — use export/import to share."`
-  - Substituir por texto apropriado (ex.: config salvo em tempo real via Lovable Cloud / Supabase).
+### 4. Integração no `Header.tsx`
+- Trocar `<img src={logoAsset.url} ... />` por `<AstronautMascot />` dentro do mesmo `<Link to="/">`.
+- Manter o texto "Ayuniqa" ao lado (ou apenas o astronauta — manter só o astronauta, fica mais limpo, como está hoje).
+- Remover o import de `logoAsset` se não for mais usado.
 
-### Rejeitado (não incluído)
+## Arquivos afetados
 
-Reintroduzir cache de `localStorage` para hidratar o estado instantaneamente. Isso violaria a regra estabelecida anteriormente de que o Supabase é a única fonte da verdade, e traria de volta o bug dos ícones obsoletos.
+- **Novo:** `src/assets/astronaut.png` (+ `astronaut.png.asset.json`)
+- **Novo (opcional):** `src/assets/astronaut-helmet.png` (+ asset json)
+- **Novo:** `src/components/site/AstronautMascot.tsx`
+- **Editado:** `src/components/site/Header.tsx`
+
+## Detalhes técnicos
+
+- Cálculo do ângulo: `Math.atan2(mouseY - centerY, mouseX - centerX) * 180/Math.PI`, depois clamp em `[-18, 18]` graus em relação à orientação neutra.
+- A rotação é aplicada apenas ao capacete; o corpo permanece estático para evitar parecer um boneco quebrando o pescoço.
+- Performance: um único listener global no `window`, atualização via `requestAnimationFrame`, sem re-render por movimento (usa `ref` + manipulação direta de `style.transform`).

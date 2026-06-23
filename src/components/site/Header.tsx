@@ -3,7 +3,7 @@ import { Menu, X, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import logoAsset from "@/assets/ayuniqa-logo.png.asset.json";
+import { AstronautMascot } from "@/components/site/AstronautMascot";
 
 const links = [
   { to: "/", label: "Home" },
@@ -32,11 +32,7 @@ export function Header() {
     >
       <div className={cn("mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8")}>
         <Link to="/" className="group flex items-center gap-2">
-          <img
-            src={logoAsset.url}
-            alt="Ayuniqa"
-            className="h-8 w-auto transition-transform duration-500 group-hover:rotate-[8deg] group-hover:scale-110 sm:h-9"
-          />
+          <AstronautMascot className="transition-transform duration-300 group-hover:scale-110" />
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
