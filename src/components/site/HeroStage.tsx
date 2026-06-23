@@ -150,30 +150,6 @@ export function HeroStage() {
         <AstronautMascot className="h-auto w-full" />
       </div>
 
-      {/* Center character image */}
-      {stage.mode === "character" && stage.character.imageUrl && (
-        <div
-          className="absolute left-1/2 top-1/2"
-          style={{
-            width: `${stage.character.scale}%`,
-            transform: `translate(-50%, calc(-50% + ${stage.character.offsetY}%)) translate(${parallax.x * 30 * stage.character.parallax}px, ${parallax.y * 30 * stage.character.parallax}px)`,
-            transition: "transform 0.25s ease-out",
-            maxWidth: "85%",
-          }}
-        >
-          <img
-            src={stage.character.imageUrl}
-            alt=""
-            draggable={false}
-            className="mx-auto h-auto w-full object-contain"
-            style={{
-              filter: stage.character.shadow
-                ? "drop-shadow(0 20px 40px color-mix(in oklab, var(--brand-orange) 45%, transparent))"
-                : undefined,
-            }}
-          />
-        </div>
-      )}
 
       {/* Floating chip badges — placed on the outer stage so they don't unbalance the centered reel box */}
       {stage.badges.megaWin.enabled && (
