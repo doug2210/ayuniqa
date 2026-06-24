@@ -526,6 +526,75 @@ function HeroAwardEditor({
   );
 }
 
+/* ---------- Hero scroll video editor (bg color + video) ---------- */
+
+function HeroScrollEditor({
+  backgroundColor,
+  videoUrl,
+  onChange,
+}: {
+  backgroundColor: string;
+  videoUrl: string | null;
+  onChange: (patch: { backgroundColor?: string; scrollVideoUrl?: string | null }) => void;
+}) {
+  return (
+    <div className="space-y-6">
+      <Card className="space-y-4 p-5">
+        <div>
+          <h3 className="font-bold">Cor de fundo do Hero</h3>
+          <p className="text-xs text-muted-foreground">
+            Cor sólida usada como background da seção principal. Sem gradientes ou efeitos.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <input
+            type="color"
+            value={backgroundColor}
+            onChange={(e) => onChange({ backgroundColor: e.target.value })}
+            className="h-10 w-14 cursor-pointer rounded-md border border-border bg-transparent p-1"
+            aria-label="Selecionar cor"
+          />
+          <Input
+            value={backgroundColor}
+            onChange={(e) => onChange({ backgroundColor: e.target.value })}
+            placeholder="#F7F3E6"
+            className="max-w-[180px] font-mono"
+          />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onChange({ backgroundColor: DEFAULT_HERO.backgroundColor })}
+          >
+            <RotateCcw className="!size-3.5" /> Reset cor
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="space-y-4 p-5">
+        <div>
+          <h3 className="font-bold">Vídeo de scroll</h3>
+          <p className="text-xs text-muted-foreground">
+            Substitui o vídeo padrão exibido ao lado do texto. O vídeo é controlado pelo scroll
+            (0s no topo, fim quando o usuário deixa o hero). Use um MP4 curto (≈ 4 segundos), sem áudio.
+          </p>
+        </div>
+        <ImageField
+          label="Arquivo de vídeo (MP4 / WebM)"
+          value={videoUrl}
+          onChange={(v) => onChange({ scrollVideoUrl: v })}
+          accept="video/mp4,video/webm,video/quicktime"
+          uploadLabel="Upload vídeo"
+          placeholder="https://… ou faça upload"
+          previewKind="video"
+        />
+        <p className="text-xs text-muted-foreground">
+          Deixe vazio para usar o vídeo padrão embutido.
+        </p>
+      </Card>
+    </div>
+  );
+}
+
 function HeroStageEditor({
   value,
   onChange,
