@@ -345,7 +345,7 @@ function HeroEditor({
         <TabsTrigger value="text">Text</TabsTrigger>
         <TabsTrigger value="stats">Stats</TabsTrigger>
         <TabsTrigger value="award">Badge</TabsTrigger>
-        <TabsTrigger value="stage">Stage</TabsTrigger>
+        <TabsTrigger value="scroll">Scroll video</TabsTrigger>
       </TabsList>
       <TabsContent value="text" className="mt-4">
         <HeroTextEditor value={value} onChange={onChange} />
@@ -362,10 +362,11 @@ function HeroEditor({
           onChange={(award) => onChange({ ...value, award })}
         />
       </TabsContent>
-      <TabsContent value="stage" className="mt-4">
-        <HeroStageEditor
-          value={value.stage}
-          onChange={(stage) => onChange({ ...value, stage })}
+      <TabsContent value="scroll" className="mt-4">
+        <HeroScrollEditor
+          backgroundColor={value.backgroundColor}
+          videoUrl={value.scrollVideoUrl}
+          onChange={(patch) => onChange({ ...value, ...patch })}
         />
       </TabsContent>
     </Tabs>
