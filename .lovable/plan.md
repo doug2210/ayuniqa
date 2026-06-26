@@ -1,63 +1,41 @@
-## Problema
+## What's broken
 
-Os jogos cadastrados aparecem corretamente na home (seção "Featured games") e na aba **Games** do admin — onde já existem os botões **Edit** e **lixeira** para alterar/excluir cada jogo. Mas a rota pública **`/games`** mostra "No games match your search." mesmo com o filtro em "All".
+The build is failing with:
 
-Como home e `/games` usam exatamente o mesmo `useGames()` (Lovable Cloud, tabela `games`), o bug está no filtro/render dessa página, não nos dados.
-
-## Causa provável
-
-`src/routes/games.index.tsx` filtra por categoria com comparação **case/whitespace-sensitive**:
-
-```ts
-games.filter((g) =>
-  (cat === "All" || g.category === cat) && ...
-)
+```text
+"getScriptPreloadAttrs" is not exported by "@tanstack/router-core"
 ```
 
-E a lista de chips de categoria é construída a partir da constante fixa `GAME_CATEGORIES = ["Classic", "Adventure", "Fantasy", "Fruits"]`. Se a categoria de um jogo no banco veio com case diferente, espaço extra, ou um valor fora dessa lista (ex.: "classic", "Slots", "Megaways"), o jogo:
+Nothing in your app code is broken. The video, sections below the hero, NumberTicker animations, and other pages all disappeared because **the SSR bundle is failing to build**, so the server falls back to an empty/error shell.
 
-1. Some quando o usuário clica em qualquer chip,
-2. E o chip dele nunca aparece nas opções.
+## Root cause
 
-Hipótese secundária: o estado inicial `cat = "All"` poderia estar sendo sobrescrito por algum efeito/hidratação SSR, mas isso é menos provável — a verificação abaixo confirma.
+The previous security fix bumped `@tanstack/react-start` to `1.168.26` to patch transitive `undici` / `js-yaml` vulnerabilities. That version of `react-start` internally pulls `@tanstack/start-server-core@1.169.15`, which in turn requires `@tanstack/router-core@1.171.13` (it uses the newer `getScriptPreloadAttrs` export).
 
-## Plano
+But `package.json` still pins:
 
-### 1. Confirmar a causa (diagnóstico rápido)
+```text
+"@tanstack/react-router":  "^1.168.25"   → resolves to 1.168.18 (highest in 1.168.x)
+"@tanstack/router-plugin": "^1.167.28"   → resolves to 1.167.x
+```
 
-- Abrir `/games` via Playwright autenticado, capturar console + os valores reais de `category` que o `useGames()` retorna (via `window` debug ou snapshot).
-- Comparar com `GAME_CATEGORIES`.
+So a top-level `router-core@1.168.17` gets hoisted, which does NOT export `getScriptPreloadAttrs`, and Rollup fails when bundling the SSR server entry. Hence the catastrophic 500 / empty preview.
 
-### 2. Corrigir `/games` para ser tolerante a dados reais
+## Fix
 
-Em `src/routes/games.index.tsx`:
+Align the rest of the `@tanstack` router family with `react-start@1.168.26` so the hoisted `router-core` is the version `react-start` expects:
 
-- **Derivar a lista de categorias dos jogos do banco** (união de `GAME_CATEGORIES` + categorias distintas presentes em `games`), em vez de usar só a constante hardcoded. Assim qualquer categoria nova cadastrada via admin aparece como chip.
-- **Comparar categoria case-insensitive e com `trim()`**, para não esconder jogos por diferença de capitalização.
-- **Buscar também em `tagline` e `category`** (não só `title`) para o input de busca, comportamento esperado de uma vitrine.
-- Manter `cat === "All"` como default mostrando tudo.
+1. Bump in `package.json`:
+   - `@tanstack/react-router` → `^1.171.13`
+   - `@tanstack/router-plugin` → `^1.171.13`
+2. Run `bun install` so the lockfile picks up matching `router-core@1.171.13` at the top level.
+3. Re-run `bun run build:dev` to confirm the SSR bundle builds and `getScriptPreloadAttrs` resolves.
+4. Reload `/`, `/games`, `/about`, `/contact` to verify the hero video, sections below it, animated numbers, and other pages are back.
 
-### 3. Padronizar a entrada no admin
+## Why not just revert react-start
 
-Em `src/components/admin/AdminPanel.tsx` (form de jogo) e/ou `src/lib/games-api.ts`:
+Downgrading `@tanstack/react-start` back to `1.167.50` would also fix the build, but it would re-open the `vulnerable_dependencies_high` / `vulnerable_dependencies_medium` findings we just resolved (`undici` + `js-yaml`). Bumping the router packages keeps the security fix in place and is the standard alignment for the TanStack Start monorepo (router + start move together).
 
-- No `toRow()` do upsert, normalizar `category` e `volatility` com `trim()` para nunca salvar espaços extras.
-- O `Select` do form já restringe à lista oficial, então cadastros novos ficam consistentes; a normalização cobre os registros antigos editados.
+## Scope
 
-### 4. Reforçar a aba Games do admin (clareza, não funcionalidade)
-
-A funcionalidade de editar/excluir já existe, mas o usuário não notou. Pequenos ajustes:
-
-- Trocar o ícone só-lixeira por **"Excluir" + ícone** para deixar a ação explícita.
-- Adicionar um cabeçalho curto acima da lista: *"Clique em **Editar** para alterar os campos ou na lixeira para remover. Mudanças vão ao ar imediatamente."*
-- Mostrar `position` (ordem) no card, já que ela controla a ordem da vitrine.
-
-### 5. Verificação
-
-- Playwright em `/games`: confirmar que todos os jogos cadastrados aparecem com filtro "All" e que filtrar por uma categoria existente mantém os respectivos jogos visíveis.
-- Confirmar no admin que Editar abre o form e Excluir remove (após confirmação) — sem regressão.
-
-## Fora do escopo
-
-- Não estou alterando o schema da tabela `games` nem as policies RLS — os dados já estão sendo lidos corretamente em outras telas.
-- Não estou adicionando uma seção separada "Featured na home"; a home já mostra os 4 primeiros por `position`, então editar o campo **Display order** no admin controla isso.
+Only `package.json` (and the resulting `bun.lock`) change. No app/source code changes. No schema or RLS changes.
