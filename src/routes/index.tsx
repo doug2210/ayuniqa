@@ -49,7 +49,8 @@ function Hero() {
         : 0;
 
   return (
-    <div data-hero-root className="relative isolate overflow-hidden" style={{ backgroundColor: h.backgroundColor }}>
+    <div data-hero-root className="relative isolate w-full overflow-hidden" style={{ backgroundColor: h.backgroundColor }}>
+      {/* Video background — true full-bleed, no parent constraint */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <HeroScrollVideo
           src={h.scrollVideoUrl}
@@ -58,10 +59,11 @@ function Hero() {
           sideCropPct={sideCropPct}
         />
       </div>
+      {/* White gradient overlay — in front of video, behind text, anchored to screen left */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-full max-w-[900px] bg-gradient-to-r from-[#FDFBF7] via-[#FDFBF7]/90 to-transparent" />
       <section className="relative z-10 flex min-h-[50vh]">
         <div className="relative z-20 mx-auto flex h-full w-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">
           <div className="relative flex w-full flex-col justify-center py-12 lg:w-1/2 lg:py-16">
-            <div className="pointer-events-none absolute inset-0 z-[-1] bg-gradient-to-r from-[#FDFBF7]/95 via-[#FDFBF7]/85 to-transparent" />
             <div className="animate-fade-up max-w-xl">
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-foreground/80 shadow-card">
                 <Sparkles className="animate-wiggle text-[color:var(--brand-orange)]" /> {h.badge}
