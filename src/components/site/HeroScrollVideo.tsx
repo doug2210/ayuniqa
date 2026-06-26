@@ -116,9 +116,9 @@ export function HeroScrollVideo({
 
     const update = () => {
       rafId = 0;
-      const section = video.closest("section");
-      if (!section || !metaReady || !video.duration) return;
-      const rect = section.getBoundingClientRect();
+      const hero = video.closest("[data-hero-root]");
+      if (!hero || !metaReady || !video.duration) return;
+      const rect = hero.getBoundingClientRect();
       const denom = rect.height || 1;
       let p = -rect.top / denom;
       if (p < 0) p = 0;
@@ -175,7 +175,7 @@ export function HeroScrollVideo({
       autoPlay={mode === "loop"}
       loop={mode === "loop"}
       disablePictureInPicture
-      className="block h-full w-full object-cover"
+      className="block h-full w-full max-w-none object-cover"
       style={
         ready
           ? crop > 0
