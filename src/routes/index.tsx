@@ -41,12 +41,12 @@ function Hero() {
   const { config, loaded } = useSiteConfig();
   const h = config.hero;
   return (
-    <section className="relative isolate overflow-hidden" style={{ backgroundColor: h.backgroundColor }}>
+    <section className="relative isolate flex max-h-[60vh] min-h-[50vh] flex-col justify-center overflow-hidden" style={{ backgroundColor: h.backgroundColor }}>
       <div className="absolute inset-0 z-0">
         <HeroScrollVideo src={h.scrollVideoUrl} mode={h.scrollVideoMode} ready={loaded} />
       </div>
       <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-[#FDFBF7]/85 via-[#FDFBF7]/55 to-[#FDFBF7]/85" />
-      <div className="relative z-20 mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-36">
+      <div className="relative z-20 mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="animate-fade-up max-w-3xl">
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-foreground/80 shadow-card">
             <Sparkles className="animate-wiggle text-[color:var(--brand-orange)]" /> {h.badge}
