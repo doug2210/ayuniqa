@@ -604,6 +604,15 @@ function HeroScrollEditor({
             pelo scroll da página ou deixá-lo rodando em loop automático.
           </p>
         </div>
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-100">
+          <p className="font-semibold">Tamanho ideal do vídeo</p>
+          <p className="mt-1 text-xs opacity-90">
+            Para evitar cortes e barras pretas, use <strong>1920×1080 (16:9)</strong> ou mais largo
+            (ex: 2560×1080). O vídeo ocupa 100% da largura da tela com altura mínima de 50vh;
+            o conteúdo importante deve ficar no <strong>centro do frame</strong>.
+            Evite arquivos com barras pretas embutidas — o player já preenche a tela automaticamente.
+          </p>
+        </div>
         <div>
           <Label className="text-xs uppercase tracking-wide text-muted-foreground">
             Modo de reprodução
