@@ -11,6 +11,24 @@ export function useAuth() {
   useEffect(() => {
     let mounted = true;
 
+    const checkAdminRole = async (authUser: User) => {
+      const { data: roleRow, error: roleError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", authUser.id)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (!mounted) return;
+
+      if (roleError) {
+        setIsAdmin(false);
+        return;
+      }
+
+      setIsAdmin(roleRow?.role === "admin");
+    };
+
     const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
       if (!mounted) return;
       // Only react to identity transitions. TOKEN_REFRESHED and INITIAL_SESSION
@@ -22,26 +40,20 @@ export function useAuth() {
       setSession(s);
       setUser(s?.user ?? null);
       if (s?.user) {
-        setTimeout(() => {
-          supabase
-            .rpc("current_user_has_role", { _role: "admin" })
-            .then(({ data }) => mounted && setIsAdmin(Boolean(data)));
-        }, 0);
+        setTimeout(() => void checkAdminRole(s.user), 0);
       } else {
         setIsAdmin(false);
       }
     });
 
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
       if (!mounted) return;
       setSession(data.session);
       setUser(data.session?.user ?? null);
       if (data.session?.user) {
-        supabase
-          .rpc("current_user_has_role", { _role: "admin" })
-          .then(({ data: ok }) => mounted && setIsAdmin(Boolean(ok)));
+        await checkAdminRole(data.session.user);
       }
-      setLoading(false);
+      if (mounted) setLoading(false);
     });
 
     return () => {
