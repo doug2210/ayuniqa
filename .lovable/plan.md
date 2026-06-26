@@ -1,32 +1,31 @@
-# Vídeo do hero em wrapper full-bleed independente
+## Objetivo
+Conectar o projeto atual ao GitHub para sincronização de código e deploy.
 
-## Diagnóstico
+## Contexto Atual
+- O projeto já possui repositório Git local (`.git` existe).
+- Ainda não está conectado ao GitHub remoto.
 
-O `<section>` do hero em `src/routes/index.tsx` já é `w-full`, mas o vídeo está dentro de um `<div class="absolute inset-0">` que herda a largura do `<section>`. Se qualquer ancestral (preview, layout, transformações futuras) limitar a largura da section, o vídeo limita junto e aparecem barras pretas nas laterais — exatamente o sintoma do print.
+## Passos
 
-A solução é desacoplar o vídeo do container de conteúdo: ele passa a se posicionar pela **viewport**, não pelo pai.
+### 1. Conectar ao GitHub via Lovable
+- No editor Lovable, abrir o menu **Plus (+)** no input do chat.
+- Selecionar **GitHub → Connect project**.
+- Autorizar o app Lovable no GitHub.
+- Escolher conta/organização e criar o repositório.
 
-## Mudanças
+### 2. Sincronização automática
+- Após conectar, o Lovable sincroniza automaticamente em tempo real.
+- Alterações no Lovable push para o GitHub.
+- Alterações no GitHub (local ou via PR) sync de volta para o Lovable.
 
-**`src/routes/index.tsx` — função `Hero`:**
+### 3. Deploy (opcional)
+- Se o objetivo for hospedar o site via GitHub Pages ou outra plataforma (Vercel, Netlify, etc.), configurar o workflow de CI/CD no repositório GitHub.
+- O código gerado é padrão (TanStack Start + Vite) e pode ser deployado em qualquer serviço que suporte Node.js/Edge.
 
-1. Adicionar `overflow-hidden` ao `<section>` (evita scroll horizontal causado pelo full-bleed).
-2. Trocar o wrapper atual do vídeo:
-   ```
-   <div className="absolute inset-0 z-0 overflow-hidden">
-   ```
-   por um wrapper full-bleed que ignora a largura do pai usando o padrão `left-1/2 -translate-x-1/2 w-screen`:
-   ```
-   <div className="pointer-events-none absolute inset-y-0 left-1/2 z-0 w-screen -translate-x-1/2 overflow-hidden">
-   ```
-   Assim o vídeo sempre ocupa 100vw, independente de qualquer container que envolva a section.
+## Pré-requisitos
+- Conta GitHub ativa.
+- Acesso ao menu de compartilhamento do Lovable (Workspace pago para algumas features avançadas, mas conexão GitHub geralmente está disponível).
 
-3. Nenhuma mudança no conteúdo de texto (continua dentro do `max-w-7xl` com alinhamento atual).
-
-**`HeroScrollVideo.tsx`:** sem alterações. O `sideCropPct` continua funcionando para cortar barras pretas embutidas no arquivo do vídeo (problema diferente, do próprio mp4).
-
-## Verificação
-
-- Playwright em viewports 1280, 1720 e 375: confirmar que o `<video>` tem `width === window.innerWidth` e `getBoundingClientRect().x === 0` em todos os casos.
-- Screenshot visual: cream/vídeo encostando em ambas as bordas, sem faixa preta.
-- Conferir que não aparece scroll horizontal na página (`document.documentElement.scrollWidth === window.innerWidth`).
+## Resultado Esperado
+- Repositório GitHub criado e sincronizado com o projeto.
+- Código disponível para clone, pull requests e deploy externo.
