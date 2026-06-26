@@ -164,7 +164,7 @@ export function HeroScrollVideo({
   const baseStyle: React.CSSProperties =
     crop > 0
       ? { position: "absolute", top: 0, height: "auto", width: `${widthPct}%`, left: `${leftPct}%` }
-      : { position: "absolute", top: 0, left: 0, width: "100%", height: "auto" };
+      : { position: "absolute", top: 0, left: 0, width: "fit-content", height: "auto" };
   return (
     <video
       ref={videoRef}
