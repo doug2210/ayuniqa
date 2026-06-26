@@ -5,7 +5,8 @@ export function HeroScrollVideo({
   src,
   mode = "scroll",
   ready = true,
-}: { src?: string | null; mode?: "scroll" | "loop"; ready?: boolean } = {}) {
+  scale = 1,
+}: { src?: string | null; mode?: "scroll" | "loop"; ready?: boolean; scale?: number } = {}) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
