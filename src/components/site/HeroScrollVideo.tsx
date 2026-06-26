@@ -175,7 +175,7 @@ export function HeroScrollVideo({
       autoPlay={mode === "loop"}
       loop={mode === "loop"}
       disablePictureInPicture
-      className="block h-full w-full object-cover"
+      className="block h-full w-full max-w-none object-cover"
       style={
         ready
           ? crop > 0
