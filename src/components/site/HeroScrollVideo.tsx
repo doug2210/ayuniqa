@@ -163,8 +163,16 @@ export function HeroScrollVideo({
   const leftPct = -crop * (widthPct / 100);
   const baseStyle: React.CSSProperties =
     crop > 0
-      ? { position: "absolute", top: 0, height: "auto", width: `${widthPct}%`, left: `${leftPct}%` }
-      : { position: "absolute", top: 0, left: 0, width: "100%", height: "auto" };
+      ? { position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", height: "100%", width: `${widthPct}%`, maxWidth: "none" }
+      : {
+          position: "absolute",
+          top: 0,
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "auto",
+          height: "100%",
+          maxWidth: "none",
+        };
   return (
     <video
       ref={videoRef}
