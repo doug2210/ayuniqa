@@ -24,7 +24,7 @@ export function useAuth() {
       if (s?.user) {
         setTimeout(() => {
           supabase
-            .rpc("has_role", { _user_id: s.user.id, _role: "admin" })
+            .rpc("current_user_has_role", { _role: "admin" })
             .then(({ data }) => mounted && setIsAdmin(Boolean(data)));
         }, 0);
       } else {
@@ -38,7 +38,7 @@ export function useAuth() {
       setUser(data.session?.user ?? null);
       if (data.session?.user) {
         supabase
-          .rpc("has_role", { _user_id: data.session.user.id, _role: "admin" })
+          .rpc("current_user_has_role", { _role: "admin" })
           .then(({ data: ok }) => mounted && setIsAdmin(Boolean(ok)));
       }
       setLoading(false);
