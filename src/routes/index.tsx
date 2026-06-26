@@ -67,7 +67,7 @@ function Hero() {
       <section className="relative z-10 flex min-h-[50vh]">
         <div className="relative z-20 mx-auto flex h-full w-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">
           <div className="relative flex w-full flex-col justify-center py-12 lg:w-1/2 lg:py-16">
-            <div className="animate-fade-up max-w-xl">
+            <div className="animate-fade-up max-w-2xl">
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-foreground/80 shadow-card">
                 <Sparkles className="animate-wiggle text-[color:var(--brand-orange)]" /> {h.badge}
               </span>
@@ -99,7 +99,7 @@ function Hero() {
 function Stat({ value, suffix = "", decimals = 0, label }: { value: number; suffix?: string; decimals?: number; label: string }) {
   return (
     <div className="relative z-30">
-      <div className="text-[31px] font-black leading-none text-gradient-brand sm:text-[41px] lg:text-[51px]">
+      <div className="text-[28px] font-black leading-none text-gradient-brand sm:text-[36px] lg:text-[44px]">
         <NumberTicker value={value} suffix={suffix} decimalPlaces={decimals} />
       </div>
       <div className="mt-2 text-sm font-bold uppercase tracking-wider text-muted-foreground">{label}</div>
