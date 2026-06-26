@@ -161,10 +161,10 @@ export function HeroScrollVideo({
   const crop = Math.max(0, Math.min(45, sideCropPct));
   const widthPct = 100 / (1 - (2 * crop) / 100);
   const leftPct = -crop * (widthPct / 100);
-  const cropStyle: React.CSSProperties =
+  const baseStyle: React.CSSProperties =
     crop > 0
       ? { position: "absolute", top: 0, height: "100%", width: `${widthPct}%`, left: `${leftPct}%` }
-      : {};
+      : { position: "absolute", inset: 0, width: "100%", height: "100%" };
   return (
     <video
       ref={videoRef}
@@ -175,14 +175,8 @@ export function HeroScrollVideo({
       autoPlay={mode === "loop"}
       loop={mode === "loop"}
       disablePictureInPicture
-      className="block h-full w-full max-w-none object-cover"
-      style={
-        ready
-          ? crop > 0
-            ? cropStyle
-            : undefined
-          : { visibility: "hidden" }
-      }
+      className="block max-w-none object-cover"
+      style={ready ? baseStyle : { ...baseStyle, visibility: "hidden" }}
     />
   );
 }
