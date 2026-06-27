@@ -16,6 +16,7 @@ import {
   Share2,
   Save,
   Check,
+  Image as ImageIcon,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -147,7 +148,8 @@ export function AdminPanel() {
       </header>
 
       <Tabs defaultValue="floating">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-7">
+          <TabsTrigger value="brand"><ImageIcon className="!size-3.5" /> Brand</TabsTrigger>
           <TabsTrigger value="floating"><Sparkles className="!size-3.5" /> Symbols</TabsTrigger>
           <TabsTrigger value="hero"><Settings2 className="!size-3.5" /> Hero</TabsTrigger>
           <TabsTrigger value="games"><Gamepad2 className="!size-3.5" /> Games</TabsTrigger>
@@ -155,6 +157,13 @@ export function AdminPanel() {
           <TabsTrigger value="contact"><MessageSquare className="!size-3.5" /> Contact</TabsTrigger>
           <TabsTrigger value="social"><Share2 className="!size-3.5" /> Social</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="brand" className="mt-6">
+          <BrandEditor
+            value={config.branding}
+            onChange={(next) => setConfig((c) => ({ ...c, branding: next }))}
+          />
+        </TabsContent>
 
         <TabsContent value="floating" className="mt-6">
           <FloatingEditor
