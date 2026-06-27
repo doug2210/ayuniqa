@@ -1658,3 +1658,37 @@ function SocialEditor({
     </div>
   );
 }
+
+/* ---------- Brand editor (logo) ---------- */
+
+function BrandEditor({
+  value,
+  onChange,
+}: {
+  value: BrandingConfig;
+  onChange: (next: BrandingConfig) => void;
+}) {
+  return (
+    <Card className="space-y-4 p-5">
+      <div>
+        <h3 className="font-bold">Site logo</h3>
+        <p className="text-xs text-muted-foreground">
+          Used in the top menu and footer across every page. Recommended: PNG or SVG with transparent background, height ≥ 72px.
+        </p>
+      </div>
+      <ImageField
+        label="Custom logo (leave empty to use the default Ayuniqa logo)"
+        value={value.logoUrl}
+        onChange={(v) => onChange({ ...value, logoUrl: v })}
+        placeholder="https://… or upload a .png / .svg"
+        accept="image/png,image/svg+xml,image/webp,image/jpeg"
+        uploadLabel="Upload logo"
+      />
+      {value.logoUrl && (
+        <Button variant="ghost" size="sm" onClick={() => onChange({ ...value, logoUrl: null })}>
+          <RotateCcw className="!size-3.5" /> Restore default logo
+        </Button>
+      )}
+    </Card>
+  );
+}
