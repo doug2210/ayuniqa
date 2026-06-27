@@ -62,6 +62,7 @@ import {
   type AboutStat,
   type SocialLink,
   type SocialPlatform,
+  type BrandingConfig,
 } from "@/lib/site-config";
 import { DEFAULT_FLOATING_ITEMS, type FloatingItem } from "@/lib/site-config";
 import { ImageField } from "./ImageField";
