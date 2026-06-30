@@ -47,14 +47,6 @@ export const Route = createFileRoute("/api/public/contact")({
         }
         const { name, company, email, message } = parsed.data;
 
-        // Persist in database (best-effort — don't block email if it fails)
-        try {
-          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-          await supabaseAdmin.from("contact_messages").insert({ name, company, email, message });
-        } catch (err) {
-          console.error("contact_messages insert failed", err);
-        }
-
         const lovableApiKey = process.env.LOVABLE_API_KEY;
         const resendApiKey = process.env.RESEND_API_KEY;
         if (!lovableApiKey || !resendApiKey) {
