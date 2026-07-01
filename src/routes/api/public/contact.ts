@@ -83,7 +83,7 @@ ${message}
           },
           body: JSON.stringify({
             from: FROM_ADDRESS,
-            to: [TO_ADDRESS],
+            to: TO_ADDRESSES,
             reply_to: email,
             subject: `New contact — ${name}${company ? ` (${company})` : ""}`,
             html,
