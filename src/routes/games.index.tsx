@@ -104,7 +104,7 @@ function GamesPage() {
         ) : filtered.length === 0 ? (
           <p className="py-20 text-center text-muted-foreground">No games match your search.</p>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((g, i) => (
               <ScrollReveal key={g.slug} animation="fade-up" delay={i * 80}>
                 <TiltCard intensity={6}>
@@ -137,7 +137,7 @@ function GamesPage() {
               <p className="mt-2 text-muted-foreground">New titles on the way — coming soon to the lobby.</p>
             </div>
           </ScrollReveal>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {upcoming.map((g, i) => (
               <ScrollReveal key={g.slug} animation="fade-up" delay={i * 80}>
                 <TiltCard intensity={6}>
